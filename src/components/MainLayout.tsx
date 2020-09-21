@@ -22,18 +22,19 @@ const MainLayout: React.FC = () => {
 
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
   const [date, setDate] = useState<moment.Moment>(moment());
+  const [height, setHeight] = useState<string>("");
 
   useEffect(() => {
-    console.log(date.toString());
-  }, [date]);
+    console.log(height);
+  }, [height]);
 
   if (loadError) return <p>Error</p>;
   if (!isLoaded) return <p>Loading...</p>;
 
   return (
     <Layout>
-      <NavBar map={map} date={date} setDate={setDate} />
-      <Map setMap={setMap} map={map} date={date} />
+      <NavBar map={map} date={date} setDate={setDate} height={height} setHeight={setHeight} />
+      <Map setMap={setMap} map={map} date={date} height={height} />
     </Layout>
   );
 };

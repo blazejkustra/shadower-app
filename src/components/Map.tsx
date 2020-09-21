@@ -4,11 +4,13 @@ import { GoogleMap } from "@react-google-maps/api";
 import mapStyles from "../styles/mapStyles";
 import MapContent from "./MapContent";
 import { Coord, getShadowCoord } from "../utils/sun";
+import { useGeolocation } from "../utils/hooks";
 
 interface MapProps {
   map: google.maps.Map | null;
   setMap: (map: google.maps.Map | null) => void;
   date: moment.Moment;
+  height: string;
 }
 
 const containerStyle = {
@@ -20,8 +22,6 @@ const center = {
   lat: 50.049683,
   lng: 19.944544,
 };
-
-const zoom = 18;
 
 const options: google.maps.MapOptions = {
   disableDefaultUI: true,
@@ -37,9 +37,10 @@ const options: google.maps.MapOptions = {
   tilt: 0,
 };
 
-const Map: React.FC<MapProps> = ({ map, setMap, date }) => {
+const Map: React.FC<MapProps> = ({ map, setMap, date, height }) => {
   const [markers, setMarkers] = useState<Array<Coord>>([]);
   const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
+  const { position } = useGeolocation();
 
   const onMapLoad = React.useCallback(
     (map: google.maps.Map) => {
@@ -61,7 +62,12 @@ const Map: React.FC<MapProps> = ({ map, setMap, date }) => {
         },
       ]);
 
-      const { lat: shadowLat, lng: shadowLng } = getShadowCoord(date.toDate(), lat, lng, 10);
+      const { lat: shadowLat, lng: shadowLng } = getShadowCoord(
+        date.toDate(),
+        lat,
+        lng,
+        parseInt(height, 10) * 3, // floors to meters conversion
+      );
       setShadowMarkers(current => [
         ...current,
         {
@@ -70,18 +76,18 @@ const Map: React.FC<MapProps> = ({ map, setMap, date }) => {
         },
       ]);
     },
-    [date],
+    [date, height],
   );
 
   useEffect(() => {
     let newShadowMarkers: Array<Coord> = [];
 
     markers.forEach(({ lat, lng }) => {
-      newShadowMarkers.push(getShadowCoord(date.toDate(), lat, lng, 10));
+      newShadowMarkers.push(getShadowCoord(date.toDate(), lat, lng, parseInt(height, 10) * 3)); // floors to meters conversion
     });
 
     setShadowMarkers(newShadowMarkers);
-  }, [date, markers]);
+  }, [date, markers, height]);
 
   return (
     <>
@@ -96,8 +102,8 @@ const Map: React.FC<MapProps> = ({ map, setMap, date }) => {
 
       <GoogleMap
         mapContainerStyle={containerStyle}
-        zoom={zoom}
-        center={center}
+        zoom={position ? 15 : 5}
+        center={position ?? center}
         options={options}
         onLoad={onMapLoad}
         onClick={onMapClick}>

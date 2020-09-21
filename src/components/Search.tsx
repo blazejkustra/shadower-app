@@ -20,7 +20,6 @@ const SearchWrapper = styled(Combobox)`
 `;
 
 const SearchInput = styled(ComboboxInput)`
-  font-family: "Roboto", sans-serif;
   padding: 0.5rem;
   font-size: 1rem;
   width: 100%;

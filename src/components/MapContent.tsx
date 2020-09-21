@@ -90,18 +90,18 @@ const MapContent: React.FC<MapContentProps> = ({ markers, setMarkers, shadowMark
         />
       ))}
       <Polygon paths={markers} options={polygonOptions} />
-      {shadowMarkers.map((_, index) => {
-        return (
-          <Polygon
-            paths={[
-              markers[index],
-              shadowMarkers[index],
-              shadowMarkers[(index + 1) % shadowMarkers.length],
-              markers[(index + 1) % shadowMarkers.length],
-            ]}
-            options={ShadowPolygonOptions}
-          />
-        );
+      {markers.map((_, index) => {
+        const polygon = [
+          markers[index],
+          shadowMarkers[index],
+          shadowMarkers[(index + 1) % shadowMarkers.length],
+          markers[(index + 1) % shadowMarkers.length],
+        ];
+        if (polygon.some(p => !p)) {
+          return null;
+        }
+
+        return <Polygon key={index} paths={polygon} options={ShadowPolygonOptions} />;
       })}
       {selected && (
         <InfoWindow

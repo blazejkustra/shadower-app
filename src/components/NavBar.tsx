@@ -4,13 +4,16 @@ import styled from "styled-components";
 import Search from "./Search";
 import DatePicker from "./DatePicker";
 import TimePicker from "./TimePicker";
+import HeightPicker from "./HeightPicker";
 
 import { Grid, Col, Row } from "react-styled-flexboxgrid";
 
 interface NavBarProps {
   map: google.maps.Map | null;
   date: moment.Moment;
-  setDate: (date: moment.Moment) => void;
+  setDate: (value: moment.Moment) => void;
+  height: string;
+  setHeight: (value: string) => void;
 }
 
 const Bar = styled.div`
@@ -24,7 +27,7 @@ const Bar = styled.div`
   height: 4rem;
 `;
 
-const NavBar: React.FC<NavBarProps> = ({ map, date, setDate }) => {
+const NavBar: React.FC<NavBarProps> = ({ map, date, setDate, height, setHeight }) => {
   return (
     <Bar>
       <Grid>
@@ -38,6 +41,9 @@ const NavBar: React.FC<NavBarProps> = ({ map, date, setDate }) => {
           </Col>
           <Col xs={6} sm={2}>
             <TimePicker date={date} setDate={setDate} />
+          </Col>
+          <Col xs={6} sm={2}>
+            <HeightPicker height={height} setHeight={setHeight} />
           </Col>
         </Row>
       </Grid>

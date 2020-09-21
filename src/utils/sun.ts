@@ -16,6 +16,10 @@ export const getSunPosition = (date: Date, lat: number, lng: number): SunPositio
 };
 
 export const getShadowCoord = (date: Date, lat: number, lng: number, height: number): Coord => {
+  if (!height) {
+    return { lat, lng };
+  }
+
   const { altitude, azimuth } = getSunPosition(date, lat, lng);
   const length = height / Math.tan(altitude) / 111111;
   const horizontal = length * Math.cos(azimuth);
