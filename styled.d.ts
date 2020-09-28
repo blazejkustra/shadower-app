@@ -3,14 +3,21 @@ import "styled-components";
 declare module "styled-components" {
   export interface DefaultTheme {
     colors: {
-      orange: "#F85E11";
-      lightOrange: "#FF7047";
-      dark: "#231F21";
-      white: "#ffffff";
-      gray: "#F4F2F3";
-      ashy: "#dddbd8";
-      soil: "#E2DDD7";
-      darkSoil: "#D6CFC7";
+      white: string;
+      dark100: string;
+      dark85: string;
+      dark70: string;
+      dark55: string;
+      dark40: string;
+      dark25: string;
+      dark10: string;
+      dark5: string;
+      purple100: string;
+      purple85: string;
+      purple70: string;
+      purple25: string;
+      purple10: string;
+      purple5: string;
     };
     font: {
       primary: "Montserrat, Ubuntu";

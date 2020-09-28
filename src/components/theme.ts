@@ -2,14 +2,21 @@ import { DefaultTheme } from "styled-components";
 
 export const theme: DefaultTheme = {
   colors: {
-    orange: "#F85E11",
-    lightOrange: "#FF7047",
-    dark: "#231F21",
     white: "#ffffff",
-    gray: "#F4F2F3",
-    ashy: "#dddbd8",
-    soil: "#E2DDD7",
-    darkSoil: "#D6CFC7",
+    dark100: "#090E25",
+    dark85: "#2E3246",
+    dark70: "#535666",
+    dark55: "#787A87",
+    dark40: "#9D9FA8",
+    dark25: "#C1C3C9",
+    dark10: "#E6E7E9",
+    dark5: "#F3F3F4",
+    purple100: "#5300D0",
+    purple85: "#640BD8",
+    purple70: "#6F12DE",
+    purple25: "#BB96EF",
+    purple10: "#F3EFFB",
+    purple5: "#FAF6FE",
   },
   font: {
     primary: "Montserrat, Ubuntu",
@@ -44,9 +51,9 @@ export const theme: DefaultTheme = {
 
 export const mediaQuery = {
   xs: `@media (max-width: 0em)`,
-  xsm: `@media (max-width: 36em)`,
-  sm: `@media (max-width: 48em)`,
-  md: `@media (max-width: 64em)`,
-  lg: `@media (max-width: 77em)`,
+  xsm: `@media (max-width: 35.9375em)`,
+  sm: `@media (max-width: 47.9375em)`,
+  md: `@media (max-width: 63.9375em)`,
+  lg: `@media (max-width: 76.9375em)`,
   overLg: `@media (min-width: 1780px)`,
 };

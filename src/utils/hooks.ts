@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-export const useGeolocation = () => {
-  const [position, setPosition] = useState<google.maps.LatLng>();
-  const [error, setError] = useState<null | string>(null);
+
+export const usePosition = () => {
+  const [center, setCenter] = useState<google.maps.LatLng>(new google.maps.LatLng(50, 20));
+  const [error, setError] = useState<string | null>(null);
 
   const onChange = ({ coords }: Position) => {
-    setPosition(new google.maps.LatLng(coords.latitude, coords.longitude));
+    setCenter(new google.maps.LatLng(coords.latitude, coords.longitude));
   };
 
   const onError = (error: PositionError) => {
@@ -19,7 +20,7 @@ export const useGeolocation = () => {
     }
 
     geolocation.getCurrentPosition(onChange, onError);
-  }, [navigator.geolocation]);
+  }, []);
 
-  return { position, error };
+  return { center, setCenter, error };
 };

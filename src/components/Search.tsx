@@ -1,53 +1,23 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import {
-  Combobox,
-  ComboboxInput,
-  ComboboxPopover,
-  ComboboxList,
-  ComboboxOption,
-} from "@reach/combobox";
+  InputWrapper,
+  Input,
+  Dropdown,
+  DropdownStyle,
+  DropdownList,
+  DropdownOption,
+  InputInfo,
+} from "../styles/DropdownStyles";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
-import styled from "styled-components";
-import { noSpacing } from "./atoms/text";
 
 interface SearchProps {
   map: google.maps.Map | null;
+  center: google.maps.LatLng;
 }
 
-const SearchWrapper = styled(Combobox)`
-  width: 100%;
-  margin-top: 1rem;
-`;
+const Search: React.FC<SearchProps> = ({ map, center }) => {
+  const inputRef = useRef<HTMLElement>(null);
 
-const SearchInput = styled(ComboboxInput)`
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 100%;
-`;
-
-const Dropdown = styled(ComboboxPopover)`
-  background-color: white;
-  border: 1px solid black;
-
-  z-index: 11;
-`;
-
-const DropdownList = styled(ComboboxList)`
-  ${noSpacing}
-  list-style-type: none;
-`;
-
-const DropdownOption = styled(ComboboxOption)`
-  background-color: white;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #ccc;
-  }
-`;
-
-const Search: React.FC<SearchProps> = ({ map }) => {
   const {
     ready,
     value,
@@ -56,17 +26,25 @@ const Search: React.FC<SearchProps> = ({ map }) => {
     clearSuggestions,
   } = usePlacesAutocomplete({
     requestOptions: {
-      location: new google.maps.LatLng(43.6532, -79.3832),
+      location: center,
       radius: 500 * 1000,
     },
     debounce: 300,
   });
 
+  const moveMapTo = useCallback(
+    ({ lat, lng }) => {
+      map?.panTo(new google.maps.LatLng(lat, lng));
+      map?.setZoom(18);
+    },
+    [map],
+  );
+
   const handleInput = (e: any) => {
     setValue(e.target.value);
   };
 
-  const handleSelect = async (address: string) => {
+  const handleSubmit = async (address: string) => {
     setValue(address, false);
     clearSuggestions();
 
@@ -79,31 +57,36 @@ const Search: React.FC<SearchProps> = ({ map }) => {
     }
   };
 
-  const moveMapTo = useCallback(
-    ({ lat, lng }) => {
-      map?.panTo(new google.maps.LatLng(lat, lng));
-      map?.setZoom(18);
-    },
-    [map],
-  );
-
   return (
-    <SearchWrapper onSelect={handleSelect}>
-      <SearchInput
+    <InputWrapper onSelect={handleSubmit}>
+      <InputInfo>Location</InputInfo>
+      <Input
+        ref={inputRef}
         value={value}
         onChange={handleInput}
+        onKeyPress={(e: KeyboardEvent) => {
+          if (e.key === "Enter") {
+            inputRef?.current?.blur();
+            handleSubmit(value);
+          }
+        }}
         disabled={!ready}
-        placeholder="Search your location"
+        placeholder="Start typing to search location"
+        empty={!value}
       />
-      <Dropdown>
-        <DropdownList>
-          {status === "OK" &&
-            data.map(({ id, description }, index) => (
-              <DropdownOption key={`${id}-${index}`} value={description} />
-            ))}
-        </DropdownList>
-      </Dropdown>
-    </SearchWrapper>
+      {status === "OK" && (
+        <>
+          <DropdownStyle portal={false} />
+          <Dropdown>
+            <DropdownList>
+              {data.map(({ id, description }, index) => (
+                <DropdownOption key={`${id}-${index}`} value={description} />
+              ))}
+            </DropdownList>
+          </Dropdown>
+        </>
+      )}
+    </InputWrapper>
   );
 };
 

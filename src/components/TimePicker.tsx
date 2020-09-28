@@ -1,56 +1,66 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useState } from "react";
 
-import "rc-time-picker/assets/index.css";
-import RcTimePicker from "rc-time-picker";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import { useDebounce } from "react-use";
 import moment from "moment";
+import styled from "styled-components";
 
 interface PickerProps {
   date: moment.Moment;
   setDate: (value: moment.Moment) => void;
 }
 
+const marks = {
+  0: <strong>12:00 am</strong>,
+  360: "6:00 am",
+  720: "",
+  1080: "18:00 am",
+  1435: {
+    style: {
+      color: "red",
+    },
+    label: <strong>100°C</strong>,
+  },
+};
+
 const TimePickerWrapper = styled.div`
-  width: 100%;
-  margin-top: 1rem;
-`;
-
-const StyledTimePicker = styled(RcTimePicker)`
-  & .rc-time-picker-panel-select-option-selected {
-    background-color: #edeffe;
-    font-weight: normal;
-  }
-
-  & .rc-time-picker-panel-select,
-  & .rc-time-picker-input,
-  & .rc-time-picker-panel-input {
-    font-family: "Roboto", sans-serif;
-    font-size: 1rem;
-    padding: 0.5rem;
-    cursor: pointer;
-
-    ::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
-  }
+  position: absolute;
+  bottom: 100px;
+  left: 100px;
+  z-index: 100;
+  width: 60%;
 `;
 
 const TimePicker: React.FC<PickerProps> = ({ date, setDate }) => {
+  const [value, setValue] = useState(date.hour() * 60 + date.minute());
+
+  const onChange = (value: number) => {
+    setValue(value);
+  };
+
+  useDebounce(
+    () => {
+      let newDate = date.clone();
+      newDate.set({
+        hour: Math.floor(value / 60),
+        minute: value % 60,
+      });
+      setDate(newDate);
+    },
+    10,
+    [value],
+  );
+
   return (
     <TimePickerWrapper>
-      <StyledTimePicker
-        defaultValue={date}
-        showSecond={false}
-        clearIcon={<div />}
-        onChange={value => {
-          let newDate = date.clone();
-          newDate.set({
-            hour: value.get("hour"),
-            minute: value.get("minute"),
-          });
-          setDate(newDate);
-        }}
+      {date.format("h:mm a")}
+      <Slider
+        max={1435}
+        step={5}
+        value={value}
+        marks={marks}
+        onChange={(value: number) => onChange(value)}
       />
     </TimePickerWrapper>
   );

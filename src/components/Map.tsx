@@ -4,23 +4,21 @@ import { GoogleMap } from "@react-google-maps/api";
 import mapStyles from "../styles/mapStyles";
 import MapContent from "./MapContent";
 import { Coord, getShadowCoord } from "../utils/sun";
-import { useGeolocation } from "../utils/hooks";
+import { Height } from "./MainLayout";
+import { useDebounce } from "react-use";
 
 interface MapProps {
   map: google.maps.Map | null;
   setMap: (map: google.maps.Map | null) => void;
   date: moment.Moment;
-  height: string;
+  height: Height;
+  center: google.maps.LatLng;
+  setCenter: (center: google.maps.LatLng) => void;
 }
 
 const containerStyle = {
   width: "100vw",
   height: "100vh",
-};
-
-const center = {
-  lat: 50.049683,
-  lng: 19.944544,
 };
 
 const options: google.maps.MapOptions = {
@@ -37,10 +35,19 @@ const options: google.maps.MapOptions = {
   tilt: 0,
 };
 
-const Map: React.FC<MapProps> = ({ map, setMap, date, height }) => {
-  const [markers, setMarkers] = useState<Array<Coord>>([]);
+const Map: React.FC<MapProps> = ({
+  map,
+  setMap,
+  date,
+  height,
+  center: debouncedCenter,
+  setCenter: setDebouncedCenter,
+}) => {
+  const [markers, setMarkers] = useState<Array<Coord>>([
+    { lat: 50.085363020659436, lng: 19.846802311638804 },
+  ]);
   const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
-  const { position } = useGeolocation();
+  const [center, setCenter] = useState<google.maps.LatLng>(debouncedCenter);
 
   const onMapLoad = React.useCallback(
     (map: google.maps.Map) => {
@@ -66,7 +73,7 @@ const Map: React.FC<MapProps> = ({ map, setMap, date, height }) => {
         date.toDate(),
         lat,
         lng,
-        parseInt(height, 10) * 3, // floors to meters conversion
+        parseInt(height.height, 10) * height.type, // floors to meters conversion
       );
       setShadowMarkers(current => [
         ...current,
@@ -83,11 +90,29 @@ const Map: React.FC<MapProps> = ({ map, setMap, date, height }) => {
     let newShadowMarkers: Array<Coord> = [];
 
     markers.forEach(({ lat, lng }) => {
-      newShadowMarkers.push(getShadowCoord(date.toDate(), lat, lng, parseInt(height, 10) * 3)); // floors to meters conversion
+      newShadowMarkers.push(
+        getShadowCoord(date.toDate(), lat, lng, parseInt(height.height, 10) * height.type),
+      ); // floors to meters conversion
     });
 
     setShadowMarkers(newShadowMarkers);
   }, [date, markers, height]);
+
+  const onCenterChanged = React.useCallback(() => {
+    const lat = map?.getCenter().lat();
+    const lng = map?.getCenter().lng();
+    if (lat && lng) {
+      setCenter(new google.maps.LatLng(lat, lng));
+    }
+  }, [map, setCenter]);
+
+  useDebounce(
+    () => {
+      setDebouncedCenter(center);
+    },
+    1000,
+    [center],
+  );
 
   return (
     <>
@@ -102,16 +127,18 @@ const Map: React.FC<MapProps> = ({ map, setMap, date, height }) => {
 
       <GoogleMap
         mapContainerStyle={containerStyle}
-        zoom={position ? 15 : 5}
-        center={position ?? center}
+        zoom={debouncedCenter.equals(new google.maps.LatLng(50, 20)) ? 5 : 15}
+        center={debouncedCenter}
         options={options}
         onLoad={onMapLoad}
-        onClick={onMapClick}>
+        onClick={onMapClick}
+        onCenterChanged={onCenterChanged}>
         <MapContent
           markers={markers}
           setMarkers={setMarkers}
           shadowMarkers={shadowMarkers}
           date={date}
+          center={debouncedCenter}
         />
       </GoogleMap>
     </>

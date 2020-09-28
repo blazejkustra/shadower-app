@@ -1,12 +1,13 @@
-import React, { useState, useCallback } from "react";
-import { Coord } from "../utils/sun";
-import { Circle, Polygon, InfoWindow } from "@react-google-maps/api";
-
+import React, { useCallback, useState } from "react";
+import { Coord, isDay } from "../utils/sun";
+import { Circle, Polygon, GroundOverlay } from "@react-google-maps/api";
+import styled from "styled-components";
 interface MapContentProps {
   markers: Array<Coord>;
   setMarkers: (markers: Array<Coord>) => void;
   shadowMarkers: Array<Coord>;
   date: moment.Moment;
+  center: google.maps.LatLng | null;
 }
 
 interface selectProps {
@@ -15,7 +16,17 @@ interface selectProps {
 }
 
 const circleOptions = {
-  fillColor: "#cccfd3",
+  fillColor: "#5300D0",
+  fillOpacity: 1,
+  strokeOpacity: 0,
+  strokeWeight: 1,
+  clickable: true,
+  draggable: true,
+  zIndex: 3,
+};
+
+const circleHoverOptions = {
+  fillColor: "#6F12DE",
   fillOpacity: 1,
   strokeOpacity: 0,
   strokeWeight: 1,
@@ -25,11 +36,11 @@ const circleOptions = {
 };
 
 const polygonOptions = {
-  fillColor: "#f2f2f2",
+  fillColor: "#BB96EF",
   fillOpacity: 1,
-  strokeColor: "#cccfd3",
+  strokeColor: "#5300D0",
   strokeOpacity: 1,
-  strokeWeight: 1,
+  strokeWeight: 3,
   clickable: false,
   draggable: false,
   editable: false,
@@ -38,11 +49,9 @@ const polygonOptions = {
 };
 
 const ShadowPolygonOptions = {
-  fillColor: "#e5e7e8",
-  fillOpacity: 1,
-  strokeColor: "#e5e7e8",
-  strokeOpacity: 1,
-  strokeWeight: 1,
+  fillColor: "#090E25",
+  fillOpacity: 0.25,
+  strokeWeight: 0,
   clickable: false,
   draggable: false,
   editable: false,
@@ -50,8 +59,14 @@ const ShadowPolygonOptions = {
   zIndex: 1,
 };
 
-const MapContent: React.FC<MapContentProps> = ({ markers, setMarkers, shadowMarkers, date }) => {
-  const [selected, setSelected] = useState<selectProps | null>(null);
+const MapContent: React.FC<MapContentProps> = ({
+  markers,
+  setMarkers,
+  shadowMarkers,
+  date,
+  center,
+}) => {
+  const [markerHovered, setHover] = useState<Coord | null>(null);
 
   const onCircleDrag = useCallback(
     (e: google.maps.MouseEvent, index: number) => {
@@ -68,14 +83,16 @@ const MapContent: React.FC<MapContentProps> = ({ markers, setMarkers, shadowMark
     [markers, setMarkers],
   );
 
-  const deleteMarker = useCallback(() => {
-    if (selected) {
+  const deleteMarker = useCallback(
+    (markerToDelete: Coord, indexToDelete: number) => {
       setMarkers(
-        markers.filter((marker, index) => marker !== selected.marker && index !== selected.index),
+        markers.filter((marker, index) => markerToDelete !== marker && indexToDelete !== index),
       );
-      setSelected(null);
-    }
-  }, [markers, setMarkers, selected]);
+    },
+    [markers, setMarkers],
+  );
+
+  const showShadows = isDay(date.toDate(), center?.lat(), center?.lng());
 
   return (
     <>
@@ -84,32 +101,28 @@ const MapContent: React.FC<MapContentProps> = ({ markers, setMarkers, shadowMark
           key={`${marker.lat}-${marker.lng}-${index}-circle`}
           center={marker}
           radius={1.5}
-          options={circleOptions}
+          options={marker === markerHovered ? circleHoverOptions : circleOptions}
+          onDragStart={() => setHover(null)}
           onDragEnd={e => onCircleDrag(e, index)}
-          onClick={() => setSelected({ marker, index })}
+          onMouseOver={() => setHover(marker)}
+          onMouseOut={() => setHover(null)}
+          onClick={() => deleteMarker(marker, index)}
         />
       ))}
       <Polygon paths={markers} options={polygonOptions} />
-      {markers.map((_, index) => {
-        const polygon = [
-          markers[index],
-          shadowMarkers[index],
-          shadowMarkers[(index + 1) % shadowMarkers.length],
-          markers[(index + 1) % shadowMarkers.length],
-        ];
-        if (polygon.some(p => !p)) {
-          return null;
-        }
+      {showShadows &&
+        markers.map((_, index) => {
+          const polygon = [
+            markers[index],
+            shadowMarkers[index],
+            shadowMarkers[(index + 1) % shadowMarkers.length],
+            markers[(index + 1) % shadowMarkers.length],
+          ];
 
-        return <Polygon key={index} paths={polygon} options={ShadowPolygonOptions} />;
-      })}
-      {selected && (
-        <InfoWindow
-          position={{ lat: selected.marker.lat, lng: selected.marker.lng }}
-          onCloseClick={() => setSelected(null)}>
-          <button onClick={deleteMarker}>Delete</button>
-        </InfoWindow>
-      )}
+          return polygon.some(p => !p) ? null : (
+            <Polygon key={index} paths={polygon} options={ShadowPolygonOptions} />
+          );
+        })}
     </>
   );
 };

@@ -10,7 +10,7 @@ export const noSpacing = css`
 export const P = styled.p`
   font-family: ${props => props.theme.font.primary};
   font-weight: ${props => props.theme.fontWeight.regular};
-  color: ${props => props.theme.colors.dark};
+  color: ${props => props.theme.colors.dark100};
   line-height: 1.625rem;
   font-size: 1rem;
 `;
@@ -33,7 +33,7 @@ export const H6 = styled.h6`
 `;
 
 export const SectionName = styled(H6)`
-  color: ${props => (props.color ? props.color : props.theme.colors.orange)};
+  color: ${props => (props.color ? props.color : props.theme.colors.purple100)};
   font-size: 0.75rem;
   font-weight: ${props => props.theme.fontWeight.regular};
   text-transform: uppercase;
@@ -45,7 +45,7 @@ export const SectionTitle = styled(H2)`
   line-height: 3.75rem;
   font-weight: ${props => props.theme.fontWeight.regular};
   letter-spacing: -0.125rem;
-  color: ${props => props.theme.colors.dark};
+  color: ${props => props.theme.colors.dark100};
 
   ${mediaQuery.sm} {
     font-size: 2.25rem;

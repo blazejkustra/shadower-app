@@ -27,3 +27,19 @@ export const getShadowCoord = (date: Date, lat: number, lng: number, height: num
 
   return { lat: lat + horizontal, lng: lng + vertical };
 };
+
+export const isDay = (date: Date, lat?: number, lng?: number): boolean => {
+  if (!lat || !lng) {
+    return false;
+  }
+
+  const { sunriseEnd, sunsetStart } = SunCalc.getTimes(date, lat, lng);
+  const startOfDay = new Date(sunriseEnd.getTime() + 10000 * 60);
+  const EndOfDay = new Date(sunsetStart.getTime() - 10000 * 60);
+
+  if (date >= startOfDay && date <= EndOfDay) {
+    return true;
+  }
+
+  return false;
+};
