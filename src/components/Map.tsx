@@ -12,8 +12,12 @@ interface MapProps {
   setMap: (map: google.maps.Map | null) => void;
   date: moment.Moment;
   height: Height;
-  center: google.maps.LatLng;
-  setCenter: (center: google.maps.LatLng) => void;
+  debouncedCenter: google.maps.LatLng;
+  setDebouncedCenter: (center: google.maps.LatLng) => void;
+  markers: Array<Coord>;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
+  shadowMarkers: Array<Coord>;
+  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
 }
 
 const containerStyle = {
@@ -23,15 +27,7 @@ const containerStyle = {
 
 const options: google.maps.MapOptions = {
   disableDefaultUI: true,
-  mapTypeControl: true,
-  zoomControlOptions: {
-    position: 9,
-  },
   styles: mapStyles,
-  mapTypeControlOptions: {
-    position: 9,
-    mapTypeIds: ["satellite", "roadmap"],
-  },
   tilt: 0,
 };
 
@@ -40,13 +36,13 @@ const Map: React.FC<MapProps> = ({
   setMap,
   date,
   height,
-  center: debouncedCenter,
-  setCenter: setDebouncedCenter,
+  debouncedCenter,
+  setDebouncedCenter,
+  markers,
+  setMarkers,
+  shadowMarkers,
+  setShadowMarkers,
 }) => {
-  const [markers, setMarkers] = useState<Array<Coord>>([
-    { lat: 50.085363020659436, lng: 19.846802311638804 },
-  ]);
-  const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
   const [center, setCenter] = useState<google.maps.LatLng>(debouncedCenter);
 
   const onMapLoad = React.useCallback(
@@ -83,7 +79,7 @@ const Map: React.FC<MapProps> = ({
         },
       ]);
     },
-    [date, height],
+    [date, height, setMarkers, setShadowMarkers],
   );
 
   useEffect(() => {
@@ -96,7 +92,7 @@ const Map: React.FC<MapProps> = ({
     });
 
     setShadowMarkers(newShadowMarkers);
-  }, [date, markers, height]);
+  }, [date, markers, setShadowMarkers, height]);
 
   const onCenterChanged = React.useCallback(() => {
     const lat = map?.getCenter().lat();
@@ -115,33 +111,22 @@ const Map: React.FC<MapProps> = ({
   );
 
   return (
-    <>
-      <button
-        style={{ zIndex: 1000, position: "absolute", top: "10rem" }}
-        onClick={() => {
-          setMarkers([]);
-          setShadowMarkers([]);
-        }}>
-        reset
-      </button>
-
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        zoom={debouncedCenter.equals(new google.maps.LatLng(50, 20)) ? 5 : 15}
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      zoom={debouncedCenter.equals(new google.maps.LatLng(50, 20)) ? 5 : 15}
+      center={debouncedCenter}
+      options={options}
+      onLoad={onMapLoad}
+      onClick={onMapClick}
+      onCenterChanged={onCenterChanged}>
+      <MapContent
+        markers={markers}
+        setMarkers={setMarkers}
+        shadowMarkers={shadowMarkers}
+        date={date}
         center={debouncedCenter}
-        options={options}
-        onLoad={onMapLoad}
-        onClick={onMapClick}
-        onCenterChanged={onCenterChanged}>
-        <MapContent
-          markers={markers}
-          setMarkers={setMarkers}
-          shadowMarkers={shadowMarkers}
-          date={date}
-          center={debouncedCenter}
-        />
-      </GoogleMap>
-    </>
+      />
+    </GoogleMap>
   );
 };
 

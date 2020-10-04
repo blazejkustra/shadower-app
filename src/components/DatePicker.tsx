@@ -43,6 +43,10 @@ const DatePickerWrapper = styled.div`
     }
   }
 
+  .DayPickerInput {
+    width: 100%;
+  }
+
   .DayPicker-Day--today {
     color: black;
     font-weight: 600;

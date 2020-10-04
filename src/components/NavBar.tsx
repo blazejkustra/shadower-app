@@ -6,6 +6,7 @@ import DatePicker from "./DatePicker";
 import HeightPicker from "./HeightPicker";
 import { Height } from "./MainLayout";
 import { mediaQuery } from "./theme";
+import { Coord } from "../utils/sun";
 
 import { Grid, Col, Row } from "react-styled-flexboxgrid";
 
@@ -16,6 +17,8 @@ interface NavBarProps {
   height: Height;
   setHeight: (value: Height) => void;
   center: google.maps.LatLng;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
+  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
 }
 
 const Bar = styled.div`
@@ -32,6 +35,7 @@ const Bar = styled.div`
 
 const StyledGrid = styled(Grid)`
   background-color: ${props => props.theme.colors.white};
+  box-shadow: 0px 24px 24px 0px rgb(9, 14, 37, 0.1);
   border-radius: 1rem;
   padding: 1rem;
 
@@ -46,35 +50,16 @@ const SearchCol = styled(Col)`
   }
 `;
 
-const Button = styled.button`
-  width: 100%;
-  background-color: ${props => props.theme.colors.purple100};
-  border: none;
-  border-radius: 0.3125rem;
-  padding: 0.7625rem 0;
-  margin-top: 2rem;
-
-  outline: none;
-  cursor: pointer;
-  font-size: 1.125rem;
-  line-height: 1.625rem;
-  color: ${props => props.theme.colors.white};
-
-  :hover {
-    background-color: ${props => props.theme.colors.purple85};
-  }
-
-  :active {
-    background-color: ${props => props.theme.colors.purple70};
-  }
-
-  :disabled {
-    background-color: ${props => props.theme.colors.dark25};
-    color: ${props => props.theme.colors.dark5};
-  }
-`; //TODO move somewhere else
-
-const NavBar: React.FC<NavBarProps> = ({ map, date, setDate, height, setHeight, center }) => {
+const NavBar: React.FC<NavBarProps> = ({
+  map,
+  date,
+  setDate,
+  height,
+  setHeight,
+  center,
+  setMarkers,
+  setShadowMarkers,
+}) => {
   return (
     <Bar>
       <StyledGrid>
@@ -82,14 +67,11 @@ const NavBar: React.FC<NavBarProps> = ({ map, date, setDate, height, setHeight, 
           <SearchCol xs={12} sm={12} md={5}>
             <Search map={map} center={center} />
           </SearchCol>
-          <Col xs={4} sm={4} md={2}>
+          <Col xs={6} sm={6} md={3}>
             <DatePicker date={date} setDate={setDate} />
           </Col>
-          <Col xs={4} sm={4} md={3}>
+          <Col xs={6} sm={6} md={4}>
             <HeightPicker height={height} setHeight={setHeight} />
-          </Col>
-          <Col xs={4} sm={4} md={2}>
-            <Button>Show results</Button> {/* TODO: use this button */}
           </Col>
         </Row>
       </StyledGrid>
