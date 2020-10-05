@@ -94,11 +94,11 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate }) => {
   return (
     <SliderWrapper>
       <CurrentTime style={{ marginLeft: `calc(${value / 14.35}% - 2rem)` }}>{time}</CurrentTime>
-      <StyledSliderIcon src="/icons/slider-12am.svg" position={0} edge />
-      <StyledSliderIcon src="/icons/slider-6am.svg" position={25} />
-      <StyledSliderIcon src="/icons/slider-12pm.svg" position={50} />
-      <StyledSliderIcon src="/icons/slider-6pm.svg" position={75} />
-      <StyledSliderIcon src="/icons/slider-12am.svg" position={100} edge />
+      <StyledSliderIcon src="/icons/slider-12am.svg" alt="Moon" position={0} edge />
+      <StyledSliderIcon src="/icons/slider-6am.svg" alt="Sunrise" position={25} />
+      <StyledSliderIcon src="/icons/slider-12pm.svg" alt="Sun in noon" position={50} />
+      <StyledSliderIcon src="/icons/slider-6pm.svg" alt="Sunset" position={75} />
+      <StyledSliderIcon src="/icons/slider-12am.svg" alt="Moon" position={100} edge />
       <Slider
         max={1435}
         step={5}

@@ -13,6 +13,18 @@ interface PickerProps {
   setDate: (value: moment.Moment) => void;
 }
 
+const InputContainer = styled.div`
+  position: relative;
+`;
+
+const CalendarImage = styled.img`
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+  margin: 0.75rem;
+`;
+
 const DatePickerWrapper = styled.div`
   input {
     width: 100%;
@@ -83,20 +95,26 @@ const DatePicker: React.FC<PickerProps> = ({ date, setDate }) => {
   return (
     <DatePickerWrapper>
       <InputInfo>Date</InputInfo>
-      <DayPickerInput
-        value={date.toDate()}
-        onDayChange={value => {
-          let newDate = moment(value);
-          newDate.set({
-            hour: date.get("hour"),
-            minute: date.get("minute"),
-          });
-          setDate(newDate);
-        }}
-        formatDate={formatDate}
-        parseDate={parseDate}
-        placeholder="MM/DD/YYYY"
-      />
+      <InputContainer>
+        <DayPickerInput
+          value={date.toDate()}
+          onDayChange={value => {
+            let newDate = moment(value);
+            newDate.set({
+              hour: date.get("hour"),
+              minute: date.get("minute"),
+            });
+            setDate(newDate);
+          }}
+          onChange={(e: React.FocusEvent<HTMLDivElement>) => {
+            e.target.blur();
+          }}
+          formatDate={formatDate}
+          parseDate={parseDate}
+          placeholder="MM/DD/YYYY"
+        />
+        <CalendarImage src="/icons/calendar.svg" alt="Map pin icon" />
+      </InputContainer>
     </DatePickerWrapper>
   );
 };

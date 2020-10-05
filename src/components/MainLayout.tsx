@@ -5,6 +5,7 @@ import NavBar from "./NavBar";
 import Map from "./Map";
 import BottomBar from "./BottomBar";
 import { Coord } from "../utils/sun";
+import { MapType } from "./MapFunctions";
 
 import styled from "styled-components";
 import moment from "moment";
@@ -24,12 +25,16 @@ const Layout = styled.div`
   height: 100vh;
 `;
 // TODO:
-// inputy naprawic zeby sie blurowały
-// zrobic tak zeby przycisk show results dzialal
 // dodac wprowadzenie - instrukcje
 // dodac znak x na usuniecie markera
 // funkcja dodawania wielu budynkow
-// usunac cien slidera
+// usunac cien przesuwaka na sliderze
+// zmienic 6am 6pm na sliderze jesli chodzi o godziny zachodu wschodu
+// ogarnac
+// ladowanie oraz error ladowania mapy
+// lokalizacja wlasna jako przycisk na dole
+// zmienic styl mapy
+// 
 
 const MainLayout: React.FC = () => {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
@@ -37,6 +42,7 @@ const MainLayout: React.FC = () => {
   const [height, setHeight] = useState<Height>({ type: HeightType.Floors, height: "1" });
   const [markers, setMarkers] = useState<Array<Coord>>([]);
   const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
+  const [mapType, setMapType] = useState(MapType.Map);
 
   const { center, setCenter } = usePosition();
 
@@ -63,6 +69,8 @@ const MainLayout: React.FC = () => {
         setDate={setDate}
         setMarkers={setMarkers}
         setShadowMarkers={setShadowMarkers}
+        mapType={mapType}
+        setMapType={setMapType}
       />
       <Map
         setMap={setMap}

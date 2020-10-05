@@ -20,7 +20,7 @@ declare module "styled-components" {
       purple5: string;
     };
     font: {
-      primary: "Montserrat, Ubuntu";
+      primary: '"Montserrat", Ubuntu';
       secondary: "RobotoSlab, Ubuntu";
     };
     fontWeight: {

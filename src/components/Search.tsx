@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import {
   InputWrapper,
   Input,
@@ -9,6 +9,46 @@ import {
   InputInfo,
 } from "../styles/DropdownStyles";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import styled from "styled-components";
+
+const ErrorText = styled.span`
+  color: red;
+`;
+
+const InputContainer = styled.div`
+  position: relative;
+`;
+
+const LocationImage = styled.img`
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+  margin: 0.75rem;
+`;
+
+const DeleteContainer = styled.div`
+  position: absolute;
+  top: 0.3125rem;
+  right: 0.3125rem;
+  border-radius: 0.3125rem;
+
+  width: 2.5rem;
+  height: 2.5rem;
+
+  :hover {
+    background-color: rgb(83, 0, 208, 0.1);
+  }
+
+  :active {
+    background-color: rgb(83, 0, 208, 0.1);
+  }
+`;
+
+const DeleteImg = styled.img`
+  padding-top: 0.5rem;
+  margin: auto;
+`;
 
 interface SearchProps {
   map: google.maps.Map | null;
@@ -16,8 +56,8 @@ interface SearchProps {
 }
 
 const Search: React.FC<SearchProps> = ({ map, center }) => {
-  const inputRef = useRef<HTMLElement>(null);
-
+  const [deleteIconSrc, setDeleteIconSrc] = useState("/icons/delete.svg");
+  const [error, setError] = useState<string | null>(null);
   const {
     ready,
     value,
@@ -42,6 +82,12 @@ const Search: React.FC<SearchProps> = ({ map, center }) => {
 
   const handleInput = (e: any) => {
     setValue(e.target.value);
+    setError(null);
+  };
+
+  const handleDelete = () => {
+    setValue("");
+    setError(null);
   };
 
   const handleSubmit = async (address: string) => {
@@ -53,27 +99,41 @@ const Search: React.FC<SearchProps> = ({ map, center }) => {
       const { lat, lng } = await getLatLng(addresses[0]);
       moveMapTo({ lat, lng });
     } catch (error) {
-      console.log("Error: ", error); // TODO
+      setError(error.toString());
     }
   };
 
   return (
     <InputWrapper onSelect={handleSubmit}>
-      <InputInfo>Location</InputInfo>
-      <Input
-        ref={inputRef}
-        value={value}
-        onChange={handleInput}
-        onKeyPress={(e: KeyboardEvent) => {
-          if (e.key === "Enter") {
-            inputRef?.current?.blur();
-            handleSubmit(value);
-          }
-        }}
-        disabled={!ready}
-        placeholder="Start typing to search location"
-        empty={!value}
-      />
+      <InputInfo>
+        Location{" "}
+        <ErrorText>
+          {error === "ZERO_RESULTS" ? "(No address matched your search)" : null}
+        </ErrorText>
+      </InputInfo>
+      <InputContainer>
+        <Input
+          value={value}
+          onChange={handleInput}
+          onKeyPress={(e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+              handleSubmit(value);
+            }
+          }}
+          disabled={!ready}
+          placeholder="Start typing to search location"
+        />
+        {value ? (
+          <DeleteContainer
+            onClick={() => handleDelete()}
+            onMouseOver={() => setDeleteIconSrc("/icons/delete-purple.svg")}
+            onMouseOut={() => setDeleteIconSrc("/icons/delete.svg")}>
+            <DeleteImg src={deleteIconSrc} alt="Delete icon" />
+          </DeleteContainer>
+        ) : (
+          <LocationImage src="/icons/map-pin.svg" alt="Map pin icon" />
+        )}
+      </InputContainer>
       {status === "OK" && (
         <>
           <DropdownStyle portal={false} />

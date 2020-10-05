@@ -6,9 +6,10 @@ import "rc-slider/assets/index.css";
 import { Grid } from "react-styled-flexboxgrid";
 import { mediaQuery } from "./theme";
 import TimePicker from "./TimePicker";
-import TypePicker from "./TypePicker";
-import { SmallButton } from "./atoms/Buttons";
+import MapFunctions from "./MapFunctions";
+import MarkerFunctions from "./MarkerFunctions";
 import { Coord } from "../utils/sun";
+import { MapType } from "./MapFunctions";
 
 interface BottomBarProps {
   date: moment.Moment;
@@ -16,6 +17,8 @@ interface BottomBarProps {
   map: google.maps.Map | null;
   setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
   setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
+  mapType: MapType;
+  setMapType: React.Dispatch<React.SetStateAction<MapType>>;
 }
 
 const Bar = styled.div`
@@ -42,14 +45,13 @@ const StyledGrid = styled(Grid)`
   }
 `;
 
-const FunctionsButtonWrapper = styled.div`
+const FunctionsWrapper = styled.div`
   position: absolute;
   bottom: 8rem;
   left: 0rem;
-`;
-
-const StyledButton = styled(SmallButton)`
-  box-shadow: 0px 16px 16px 0px rgb(9, 14, 37, 0.1);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const BottomBar: React.FC<BottomBarProps> = ({
@@ -58,29 +60,21 @@ const BottomBar: React.FC<BottomBarProps> = ({
   map,
   setMarkers,
   setShadowMarkers,
+  mapType,
+  setMapType,
 }) => {
   return (
     <Bar>
       <StyledGrid>
+        <FunctionsWrapper>
+          <MarkerFunctions
+            setMarkers={setMarkers}
+            setShadowMarkers={setShadowMarkers}
+            mapType={mapType}
+          />
+          <MapFunctions map={map} mapType={mapType} setMapType={setMapType} />
+        </FunctionsWrapper>
         <TimePicker date={date} setDate={setDate} />
-        <FunctionsButtonWrapper>
-          <StyledButton
-            style={{ marginRight: "1rem" }}
-            onClick={() => {
-              setMarkers([]);
-              setShadowMarkers([]);
-            }}>
-            Reset all
-          </StyledButton>
-          <StyledButton
-            onClick={() => {
-              setMarkers([]);
-              setShadowMarkers([]);
-            }}>
-            Add new shape
-          </StyledButton>
-        </FunctionsButtonWrapper>
-        <TypePicker map={map} />
       </StyledGrid>
     </Bar>
   );

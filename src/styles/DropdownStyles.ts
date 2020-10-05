@@ -5,6 +5,7 @@ import {
   ComboboxList,
   ComboboxOption,
 } from "@reach/combobox";
+import { ListboxOption, Listbox } from "@reach/listbox";
 import styled from "styled-components";
 import { noSpacing } from "../components/atoms/text";
 
@@ -14,7 +15,7 @@ export const InputWrapper = styled(Combobox)`
   font-family: "Manrope", sans-serif;
 `;
 
-export const Input = styled(ComboboxInput)<{ empty?: boolean }>`
+export const Input = styled(ComboboxInput)`
   width: 100%;
   padding: 0.7rem 1rem;
   z-index: 12;
@@ -29,8 +30,7 @@ export const Input = styled(ComboboxInput)<{ empty?: boolean }>`
     color: ${props => props.theme.colors.dark55};
   }
 
-  border: 1px solid
-    ${props => (props.empty ? props.theme.colors.dark55 : props.theme.colors.purple100)};
+  border: 1px solid ${props => props.theme.colors.purple100};
   border-radius: 0.3125rem;
   background-color: ${props => props.theme.colors.white};
 
@@ -98,4 +98,50 @@ export const InputInfo = styled.p`
   line-height: 1.5rem;
 
   padding-bottom: 0.5rem;
+`;
+
+export const StyledListbox = styled(Listbox)`
+  width: 100%;
+  padding: 0.7rem 1rem;
+  z-index: 12;
+
+  outline: none;
+  font: unset;
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+  color: ${props => props.theme.colors.dark100};
+
+  ::placeholder {
+    color: ${props => props.theme.colors.dark55};
+  }
+
+  border: 1px solid ${props => props.theme.colors.purple100};
+  border-radius: 0.3125rem;
+  background-color: ${props => props.theme.colors.white};
+
+  :hover {
+    background-color: ${props => props.theme.colors.purple5};
+  }
+
+  :focus {
+    background-color: ${props => props.theme.colors.purple10};
+  }
+`;
+
+export const StyledListboxOption = styled(ListboxOption)`
+  cursor: pointer;
+  width: 100%;
+  padding: 0.7rem 1rem;
+
+  outline: none;
+  font: unset;
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+  color: ${props => props.theme.colors.dark100};
+
+  background-color: ${props => props.theme.colors.white};
+
+  :hover {
+    background-color: ${props => props.theme.colors.purple5};
+  }
 `;

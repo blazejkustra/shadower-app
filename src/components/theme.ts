@@ -19,7 +19,7 @@ export const theme: DefaultTheme = {
     purple5: "#FAF6FE",
   },
   font: {
-    primary: "Montserrat, Ubuntu",
+    primary: '"Montserrat", Ubuntu',
     secondary: "RobotoSlab, Ubuntu",
   },
   fontWeight: {

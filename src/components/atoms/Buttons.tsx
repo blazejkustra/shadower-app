@@ -1,13 +1,8 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
-const Button = styled.button`
+const purpleButton = css`
   background-color: ${props => props.theme.colors.purple100};
   color: ${props => props.theme.colors.white};
-  border: none;
-  border-radius: 0.3125rem;
-
-  outline: none;
-  cursor: pointer;
 
   :hover {
     background-color: ${props => props.theme.colors.purple85};
@@ -16,6 +11,32 @@ const Button = styled.button`
   :active {
     background-color: ${props => props.theme.colors.purple70};
   }
+`;
+
+const whiteButton = css`
+  background-color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.dark100};
+
+  :hover {
+    background-color: ${props => props.theme.colors.dark5};
+  }
+
+  :active {
+    background-color: ${props => props.theme.colors.dark10};
+  }
+`;
+
+const Button = styled.button<{ white?: boolean }>`
+  border: none;
+  border-radius: 0.3125rem;
+  font: unset;
+  font-weight: 500;
+  font-family: "Manrope", sans-serif;
+
+  outline: none;
+  cursor: pointer;
+
+  ${props => (props.white ? whiteButton : purpleButton)}
 
   :disabled {
     background-color: ${props => props.theme.colors.dark25};
@@ -34,6 +55,5 @@ export const SmallButton = styled(Button)`
   padding: 0.625rem 0.75rem;
 
   font-size: 0.875rem;
-  font-weight: 500;
   line-height: 0.875rem;
 `;

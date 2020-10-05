@@ -26,6 +26,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@reach/combobox": "^0.11.0",
+    "@reach/listbox": "^0.11.2",
     "@react-google-maps/api": "^1.9.12",
     "@turf/intersect": "^6.1.3",
     "@turf/turf": "^5.1.6",

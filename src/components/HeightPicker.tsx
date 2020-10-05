@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   InputWrapper,
   Input,
@@ -21,7 +21,16 @@ const TypeWrapper = styled(InputWrapper)`
 `;
 
 const InputContainer = styled.div`
+  position: relative;
   display: flex;
+`;
+
+const ChevronImage = styled.img`
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+  margin: 0.875rem;
 `;
 
 interface SearchProps {
@@ -30,6 +39,8 @@ interface SearchProps {
 }
 
 const HeightPicker: React.FC<SearchProps> = ({ height, setHeight }) => {
+  const [inputFocused, setFocus] = useState(false);
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
       setHeight({ ...height, height: "0" });
@@ -58,16 +69,23 @@ const HeightPicker: React.FC<SearchProps> = ({ height, setHeight }) => {
           <Input value={height.height} onChange={handleInput} placeholder="Object height" />
         </HeightWrapper>
 
-        <TypeWrapper openOnFocus onSelect={handleSelect}>
+        <TypeWrapper
+          openOnFocus
+          onSelect={handleSelect}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}>
           <Input value={height.type === HeightType.Floors ? "Floors" : "Meters"} />
           <DropdownStyle portal={false} />
           <Dropdown>
             <DropdownList persistSelection>
-              <DropdownOption value="Floors" />
-              <DropdownOption value="Meters" />
+              <DropdownOption value={height.type === HeightType.Meters ? "Floors" : "Meters"} />
             </DropdownList>
           </Dropdown>
         </TypeWrapper>
+        <ChevronImage
+          src={inputFocused ? "/icons/chevron-up.svg" : "/icons/chevron-down.svg"}
+          alt="Map pin icon"
+        />
       </InputContainer>
     </>
   );
