@@ -25,23 +25,23 @@ const Layout = styled.div`
   height: 100vh;
 `;
 // TODO:
-// funkcja dodawania wielu budynkow
-// nazwanie kazdego poligonu literkami
 // blad z markerem w tym samym miejscu
 // blad z czasem
 // blad ze zmiana strefy czasowej
 // poszukac wiecej bledow, zwalidowac dlugosc cieni
+// zmienic style poligonow z zaleznosci od typu mapy (satelita/normalna)
 
 const MainLayout: React.FC = () => {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
   const [date, setDate] = useState<DateTime>(DateTime.local());
   const [timezone, setTimezone] = useState<string>("");
   const [height, setHeight] = useState<Height>({ type: HeightType.Floors, height: "1" });
-  const [markers, setMarkers] = useState<Array<Coord>>([]);
-  const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
+  const [markers, setMarkers] = useState<Array<Array<Coord>>>([[], [], [], []]);
+  const [shadowMarkers, setShadowMarkers] = useState<Array<Array<Coord>>>([[], [], [], []]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [mapType, setMapType] = useState(MapType.Map);
   const [center, setCenter] = useState<google.maps.LatLng>(new google.maps.LatLng(50, 20));
-  console.log(markers);
+
   useEffect(() => {
     setTimezone(tzLookup(center.lat(), center.lng()));
   }, [center]);
@@ -67,6 +67,8 @@ const MainLayout: React.FC = () => {
         setMapType={setMapType}
         center={center}
         setCenter={setCenter}
+        activeIndex={activeIndex}
+        setActiveIndex={setActiveIndex}
       />
       <Map
         setMap={setMap}
@@ -75,6 +77,7 @@ const MainLayout: React.FC = () => {
         height={height}
         debouncedCenter={center}
         setDebouncedCenter={setCenter}
+        activeIndex={activeIndex}
         markers={markers}
         setMarkers={setMarkers}
         shadowMarkers={shadowMarkers}

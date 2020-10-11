@@ -17,12 +17,14 @@ interface BottomBarProps {
   date: DateTime;
   setDate: (value: DateTime) => void;
   map: google.maps.Map | null;
-  setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
-  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
   mapType: MapType;
   setMapType: React.Dispatch<React.SetStateAction<MapType>>;
   center: google.maps.LatLng;
   setCenter: (center: google.maps.LatLng) => void;
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
 }
 
 const Bar = styled.div`
@@ -64,6 +66,8 @@ const BottomBar: React.FC<BottomBarProps> = ({
   center,
   timezone,
   setCenter,
+  activeIndex,
+  setActiveIndex,
 }) => {
   return (
     <Bar>
@@ -73,6 +77,8 @@ const BottomBar: React.FC<BottomBarProps> = ({
             setMarkers={setMarkers}
             setShadowMarkers={setShadowMarkers}
             mapType={mapType}
+            activeIndex={activeIndex}
+            setActiveIndex={setActiveIndex}
           />
           <MapFunctions map={map} mapType={mapType} setMapType={setMapType} setCenter={setCenter} />
         </FunctionsWrapper>

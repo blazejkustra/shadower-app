@@ -16,10 +16,11 @@ interface MapProps {
   height: Height;
   debouncedCenter: google.maps.LatLng;
   setDebouncedCenter: (center: google.maps.LatLng) => void;
-  markers: Array<Coord>;
-  setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
-  shadowMarkers: Array<Coord>;
-  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
+  activeIndex: number;
+  markers: Array<Array<Coord>>;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  shadowMarkers: Array<Array<Coord>>;
+  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
 }
 
 const MapContainer = styled.div`
@@ -48,6 +49,7 @@ const Map: React.FC<MapProps> = ({
   height,
   debouncedCenter,
   setDebouncedCenter,
+  activeIndex,
   markers,
   setMarkers,
   shadowMarkers,
@@ -64,41 +66,40 @@ const Map: React.FC<MapProps> = ({
 
   const onMapClick = React.useCallback(
     (e: google.maps.MouseEvent) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-
-      const { lat: shadowLat, lng: shadowLng } = getShadowCoord(
+      const objectCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+      const shadowCoord = getShadowCoord(
         date.toJSDate(),
-        lat,
-        lng,
+        objectCoord.lat,
+        objectCoord.lng,
         parseInt(height.height, 10) * height.type, // floors to meters conversion
       );
-      setShadowMarkers(current => [
-        ...current,
-        {
-          lat: shadowLat,
-          lng: shadowLng,
-        },
-      ]);
-      setMarkers(current => [
-        ...current,
-        {
-          lat,
-          lng,
-        },
-      ]);
+
+      setShadowMarkers(current => {
+        return current.map((markersGroup, groupIndex) =>
+          groupIndex === activeIndex ? [...markersGroup, shadowCoord] : markersGroup,
+        );
+      });
+
+      setMarkers(current => {
+        return current.map((markersGroup, groupIndex) =>
+          groupIndex === activeIndex ? [...markersGroup, objectCoord] : markersGroup,
+        );
+      });
     },
-    [date, height, setMarkers, setShadowMarkers],
+    [date, height, setMarkers, setShadowMarkers, activeIndex],
   );
 
   useEffect(() => {
-    let newShadowMarkers: Array<Coord> = [];
+    let newShadowMarkers: Array<Array<Coord>> = [[], [], [], []];
 
-    markers.forEach(({ lat, lng }) => {
-      newShadowMarkers.push(
-        getShadowCoord(date.toJSDate(), lat, lng, parseInt(height.height, 10) * height.type),
-      ); // floors to meters conversion
+    markers.forEach((markersGroup, groupIndex) => {
+      markersGroup.forEach(({ lat, lng }) => {
+        newShadowMarkers[groupIndex].push(
+          getShadowCoord(date.toJSDate(), lat, lng, parseInt(height.height, 10) * height.type),
+        ); // floors to meters conversion
+      });
     });
+
     setShadowMarkers(newShadowMarkers);
   }, [date, markers, setShadowMarkers, height]);
 
@@ -124,7 +125,7 @@ const Map: React.FC<MapProps> = ({
     <MapContainer>
       <GoogleMap
         mapContainerStyle={containerStyle}
-        zoom={debouncedCenter.equals(new google.maps.LatLng(50, 20)) ? 5 : 15}
+        zoom={5}
         center={debouncedCenter}
         options={options}
         onLoad={onMapLoad}
@@ -136,6 +137,7 @@ const Map: React.FC<MapProps> = ({
           shadowMarkers={shadowMarkers}
           date={date}
           center={debouncedCenter}
+          activeIndex={activeIndex}
         />
       </GoogleMap>
     </MapContainer>

@@ -5,16 +5,12 @@ import { Circle, Polygon } from "@react-google-maps/api";
 import { DateTime } from "luxon";
 
 interface MapContentProps {
-  markers: Array<Coord>;
-  setMarkers: (markers: Array<Coord>) => void;
-  shadowMarkers: Array<Coord>;
+  markers: Array<Array<Coord>>;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  shadowMarkers: Array<Array<Coord>>;
   date: DateTime;
   center: google.maps.LatLng | null;
-}
-
-interface selectProps {
-  marker: Coord;
-  index: number;
+  activeIndex: number;
 }
 
 const circleOptions = {
@@ -36,8 +32,8 @@ const circleHoverOptions = {
 };
 
 const transparentPolygonOptions = {
-  fillColor: "#BB96EF",
-  fillOpacity: 0.7,
+  fillColor: "#8A30FD",
+  fillOpacity: 0.3,
   strokeColor: "#5300D0",
   strokeOpacity: 1,
   strokeWeight: 3,
@@ -65,53 +61,76 @@ const MapContent: React.FC<MapContentProps> = ({
   shadowMarkers,
   date,
   center,
+  activeIndex,
 }) => {
   const [markerHovered, setHover] = useState<Coord | null>(null);
 
   const onCircleDrag = useCallback(
     (e: google.maps.MouseEvent, index: number) => {
-      setMarkers(
-        markers.map((marker, markerIndex) => {
-          if (markerIndex === index) {
-            return { lat: e.latLng.lat(), lng: e.latLng.lng() };
-          } else {
-            return marker;
-          }
-        }),
-      );
+      const newCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+
+      setMarkers(current => {
+        return current.map((markersGroup, groupIndex) =>
+          groupIndex === activeIndex
+            ? markersGroup.map((marker, markerIndex) => {
+                if (markerIndex === index) {
+                  return newCoord;
+                } else {
+                  return marker;
+                }
+              })
+            : markersGroup,
+        );
+      });
     },
-    [markers, setMarkers],
+    [setMarkers, activeIndex],
   );
 
   const deleteMarker = useCallback(
     (markerToDelete: Coord, indexToDelete: number) => {
-      setMarkers(
-        markers.filter((marker, index) => markerToDelete !== marker && indexToDelete !== index),
-      );
+      setMarkers(current => {
+        return current.map((markersGroup, groupIndex) =>
+          groupIndex === activeIndex
+            ? markersGroup.filter(
+                (marker, index) => markerToDelete !== marker && indexToDelete !== index,
+              )
+            : markersGroup,
+        );
+      });
     },
-    [markers, setMarkers],
+    [setMarkers, activeIndex],
   );
 
   const showShadow = isDay(date.toJSDate(), center?.lat(), center?.lng());
-  const shadowPolygon = showShadow ? getShadowPolygons(markers, shadowMarkers) : markers;
+  const shadowPolygons = showShadow
+    ? markers.map((markerGroup, index) => getShadowPolygons(markerGroup, shadowMarkers[index]))
+    : [markers];
 
   return (
     <>
-      {markers.map((marker, index) => (
-        <Circle
-          key={`${marker.lat}-${marker.lng}-${index}-circle`}
-          center={marker}
-          radius={1}
-          options={marker === markerHovered ? circleHoverOptions : circleOptions}
-          onDragStart={() => setHover(null)}
-          onDragEnd={e => onCircleDrag(e, index)}
-          onMouseOver={() => setHover(marker)}
-          onMouseOut={() => setHover(null)}
-          onClick={() => deleteMarker(marker, index)}
-        />
-      ))}
+      {markers.map((markerGroup, groupIndex) => {
+        return markerGroup.map((marker, index) => {
+          if (groupIndex === activeIndex) {
+            return (
+              <Circle
+                key={`${marker.lat}-${marker.lng}-${index}-${groupIndex}`}
+                center={marker}
+                radius={1}
+                options={marker === markerHovered ? circleHoverOptions : circleOptions}
+                onDragStart={() => setHover(null)}
+                onDragEnd={e => onCircleDrag(e, index)}
+                onMouseOver={() => setHover(marker)}
+                onMouseOut={() => setHover(null)}
+                onClick={() => deleteMarker(marker, index)}
+              />
+            );
+          }
+        });
+      })}
       <Polygon paths={markers} options={transparentPolygonOptions} />
-      <Polygon paths={shadowPolygon} options={ShadowPolygonOptions} />
+      {shadowPolygons.map((shadowPolygon, index: number) => (
+        <Polygon paths={shadowPolygon} options={ShadowPolygonOptions} key={index} />
+      ))}
     </>
   );
 };
