@@ -10,6 +10,7 @@ import {
 } from "../styles/DropdownStyles";
 import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 import styled from "styled-components";
+import { mediaQuery } from "./theme";
 
 const ErrorText = styled.span`
   color: red;
@@ -25,6 +26,10 @@ const LocationImage = styled.img`
   right: 0;
   pointer-events: none;
   margin: 0.75rem;
+
+  ${mediaQuery.sm} {
+    margin: 0.5rem;
+  }
 `;
 
 const DeleteContainer = styled.div`
@@ -36,6 +41,8 @@ const DeleteContainer = styled.div`
   width: 2.5rem;
   height: 2.5rem;
 
+  cursor: pointer;
+
   :hover {
     background-color: rgb(83, 0, 208, 0.1);
   }
@@ -43,11 +50,24 @@ const DeleteContainer = styled.div`
   :active {
     background-color: rgb(83, 0, 208, 0.1);
   }
+
+  ${mediaQuery.sm} {
+    top: 0.25rem;
+    right: 0.25rem;
+
+    width: 2rem;
+    height: 2rem;
+  }
 `;
 
 const DeleteImg = styled.img`
   padding-top: 0.5rem;
   margin: auto;
+
+  ${mediaQuery.sm} {
+    padding-top: 0.375rem;
+    width: 1.25rem;
+  }
 `;
 
 interface SearchProps {
@@ -75,7 +95,7 @@ const Search: React.FC<SearchProps> = ({ map, center }) => {
   const moveMapTo = useCallback(
     ({ lat, lng }) => {
       map?.panTo(new google.maps.LatLng(lat, lng));
-      map?.setZoom(18);
+      map?.setZoom(19);
     },
     [map],
   );

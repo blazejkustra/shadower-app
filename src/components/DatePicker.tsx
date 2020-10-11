@@ -5,12 +5,14 @@ import "react-day-picker/lib/style.css";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 // @ts-ignore
 import { formatDate, parseDate } from "react-day-picker/moment";
-import moment from "moment";
+import { DateTime } from "luxon";
 
+import { mediaQuery } from "./theme";
 import { InputInfo } from "../styles/DropdownStyles";
+
 interface PickerProps {
-  date: moment.Moment;
-  setDate: (value: moment.Moment) => void;
+  date: DateTime;
+  setDate: (value: DateTime) => void;
 }
 
 const InputContainer = styled.div`
@@ -23,6 +25,9 @@ const CalendarImage = styled.img`
   right: 0;
   pointer-events: none;
   margin: 0.75rem;
+  ${mediaQuery.sm} {
+    margin: 0.5rem;
+  }
 `;
 
 const DatePickerWrapper = styled.div`
@@ -52,6 +57,12 @@ const DatePickerWrapper = styled.div`
     :focus {
       background-color: ${props => props.theme.colors.purple10};
       border-radius: 0.3125rem 0.3125rem 0 0;
+    }
+
+    ${mediaQuery.sm} {
+      font-size: 1rem;
+      line-height: 1rem;
+      padding: 0.5rem 1rem;
     }
   }
 
@@ -97,14 +108,14 @@ const DatePicker: React.FC<PickerProps> = ({ date, setDate }) => {
       <InputInfo>Date</InputInfo>
       <InputContainer>
         <DayPickerInput
-          value={date.toDate()}
+          value={date.toJSDate()}
           onDayChange={value => {
-            let newDate = moment(value);
-            newDate.set({
-              hour: date.get("hour"),
-              minute: date.get("minute"),
-            });
-            setDate(newDate);
+            setDate(
+              DateTime.fromJSDate(value).set({
+                hour: date.get("hour"),
+                minute: date.get("minute"),
+              }),
+            );
           }}
           onChange={(e: React.FocusEvent<HTMLDivElement>) => {
             e.target.blur();

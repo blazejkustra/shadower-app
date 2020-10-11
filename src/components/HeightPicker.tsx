@@ -10,13 +10,14 @@ import {
 } from "../styles/DropdownStyles";
 import { Height, HeightType } from "./MainLayout";
 import styled from "styled-components";
+import { mediaQuery } from "./theme";
 
 const HeightWrapper = styled(InputWrapper)`
   width: 50%;
 `;
 
 const TypeWrapper = styled(InputWrapper)`
-  width: 50%;
+  width: calc(50% + 5px);
   margin-left: -5px;
 `;
 
@@ -31,6 +32,10 @@ const ChevronImage = styled.img`
   right: 0;
   pointer-events: none;
   margin: 0.875rem;
+
+  ${mediaQuery.sm} {
+    margin: 0.5rem;
+  }
 `;
 
 interface SearchProps {

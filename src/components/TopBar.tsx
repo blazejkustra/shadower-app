@@ -6,19 +6,17 @@ import DatePicker from "./DatePicker";
 import HeightPicker from "./HeightPicker";
 import { Height } from "./MainLayout";
 import { mediaQuery } from "./theme";
-import { Coord } from "../utils/sun";
+import { DateTime } from "luxon";
 
 import { Grid, Col, Row } from "react-styled-flexboxgrid";
 
-interface NavBarProps {
+interface TopBarProps {
   map: google.maps.Map | null;
-  date: moment.Moment;
-  setDate: (value: moment.Moment) => void;
+  date: DateTime;
+  setDate: (value: DateTime) => void;
   height: Height;
   setHeight: (value: Height) => void;
   center: google.maps.LatLng;
-  setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
-  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
 }
 
 const Bar = styled.div`
@@ -48,18 +46,13 @@ const SearchCol = styled(Col)`
   ${mediaQuery.md} {
     margin-bottom: 1rem;
   }
+
+  ${mediaQuery.sm} {
+    margin-bottom: 0.5rem;
+  }
 `;
 
-const NavBar: React.FC<NavBarProps> = ({
-  map,
-  date,
-  setDate,
-  height,
-  setHeight,
-  center,
-  setMarkers,
-  setShadowMarkers,
-}) => {
+const TopBar: React.FC<TopBarProps> = ({ map, date, setDate, height, setHeight, center }) => {
   return (
     <Bar>
       <StyledGrid>
@@ -79,4 +72,4 @@ const NavBar: React.FC<NavBarProps> = ({
   );
 };
 
-export default NavBar;
+export default TopBar;

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { usePosition } from "../utils/hooks";
 
-import NavBar from "./NavBar";
+import TopBar from "./TopBar";
 import Map from "./Map";
 import BottomBar from "./BottomBar";
 import { Coord } from "../utils/sun";
 import { MapType } from "./MapFunctions";
 
 import styled from "styled-components";
-import moment from "moment";
+import { DateTime } from "luxon";
+import tzLookup from "tz-lookup";
 
 export enum HeightType {
   Meters = 1,
@@ -25,52 +25,48 @@ const Layout = styled.div`
   height: 100vh;
 `;
 // TODO:
-// dodac wprowadzenie - instrukcje
-// dodac znak x na usuniecie markera
 // funkcja dodawania wielu budynkow
-// usunac cien przesuwaka na sliderze
-// zmienic 6am 6pm na sliderze jesli chodzi o godziny zachodu wschodu
-// ogarnac
-// ladowanie oraz error ladowania mapy
-// lokalizacja wlasna jako przycisk na dole
-// zmienic styl mapy
-// 
+// nazwanie kazdego poligonu literkami
+// blad z markerem w tym samym miejscu
+// blad z czasem
+// blad ze zmiana strefy czasowej
+// poszukac wiecej bledow, zwalidowac dlugosc cieni
 
 const MainLayout: React.FC = () => {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
-  const [date, setDate] = useState<moment.Moment>(moment());
+  const [date, setDate] = useState<DateTime>(DateTime.local());
+  const [timezone, setTimezone] = useState<string>("");
   const [height, setHeight] = useState<Height>({ type: HeightType.Floors, height: "1" });
   const [markers, setMarkers] = useState<Array<Coord>>([]);
   const [shadowMarkers, setShadowMarkers] = useState<Array<Coord>>([]);
   const [mapType, setMapType] = useState(MapType.Map);
-
-  const { center, setCenter } = usePosition();
-
+  const [center, setCenter] = useState<google.maps.LatLng>(new google.maps.LatLng(50, 20));
+  console.log(markers);
   useEffect(() => {
-    // TODO delete
-    // console.log(map);
-  }, [map]);
+    setTimezone(tzLookup(center.lat(), center.lng()));
+  }, [center]);
 
   return (
     <Layout>
-      <NavBar
+      <TopBar
         map={map}
         date={date}
         setDate={setDate}
         height={height}
         setHeight={setHeight}
         center={center}
-        setMarkers={setMarkers}
-        setShadowMarkers={setShadowMarkers}
       />
       <BottomBar
         map={map}
+        timezone={timezone}
         date={date}
         setDate={setDate}
         setMarkers={setMarkers}
         setShadowMarkers={setShadowMarkers}
         mapType={mapType}
         setMapType={setMapType}
+        center={center}
+        setCenter={setCenter}
       />
       <Map
         setMap={setMap}

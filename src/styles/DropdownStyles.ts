@@ -8,6 +8,7 @@ import {
 import { ListboxOption, Listbox } from "@reach/listbox";
 import styled from "styled-components";
 import { noSpacing } from "../components/atoms/text";
+import { mediaQuery } from "../components/theme";
 
 export const InputWrapper = styled(Combobox)`
   width: 100%;
@@ -40,6 +41,12 @@ export const Input = styled(ComboboxInput)`
 
   :focus {
     background-color: ${props => props.theme.colors.purple10};
+  }
+
+  ${mediaQuery.sm} {
+    font-size: 1rem;
+    line-height: 1rem;
+    padding: 0.5rem 1rem;
   }
 `;
 
@@ -88,6 +95,12 @@ export const DropdownOption = styled(ComboboxOption)`
   :hover {
     background-color: ${props => props.theme.colors.purple5};
   }
+
+  ${mediaQuery.sm} {
+    font-size: 1rem;
+    line-height: 1rem;
+    padding: 0.5rem 1rem;
+  }
 `;
 
 export const InputInfo = styled.p`
@@ -98,6 +111,12 @@ export const InputInfo = styled.p`
   line-height: 1.5rem;
 
   padding-bottom: 0.5rem;
+
+  ${mediaQuery.sm} {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding-bottom: 0.25rem;
+  }
 `;
 
 export const StyledListbox = styled(Listbox)`

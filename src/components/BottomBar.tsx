@@ -10,23 +10,28 @@ import MapFunctions from "./MapFunctions";
 import MarkerFunctions from "./MarkerFunctions";
 import { Coord } from "../utils/sun";
 import { MapType } from "./MapFunctions";
+import { DateTime } from "luxon";
 
 interface BottomBarProps {
-  date: moment.Moment;
-  setDate: (value: moment.Moment) => void;
+  timezone: string;
+  date: DateTime;
+  setDate: (value: DateTime) => void;
   map: google.maps.Map | null;
   setMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
   setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Coord>>>;
   mapType: MapType;
   setMapType: React.Dispatch<React.SetStateAction<MapType>>;
+  center: google.maps.LatLng;
+  setCenter: (center: google.maps.LatLng) => void;
 }
 
 const Bar = styled.div`
   position: absolute;
-  left: 0rem;
   bottom: 2rem;
+  left: 0rem;
+  z-index: 30;
+
   width: 100%;
-  z-index: 10;
 
   ${mediaQuery.sm} {
     bottom: 0rem;
@@ -34,24 +39,18 @@ const Bar = styled.div`
 `;
 
 const StyledGrid = styled(Grid)`
-  position: relative;
-  background-color: ${props => props.theme.colors.white};
-  box-shadow: 0px 24px 24px 0px rgb(9, 14, 37, 0.1);
-  border-radius: 1rem;
-  padding: 1rem 3rem 3rem 3rem;
-
-  ${mediaQuery.sm} {
-    border-radius: 0rem;
-  }
+  padding: 0;
 `;
 
 const FunctionsWrapper = styled.div`
-  position: absolute;
-  bottom: 8rem;
-  left: 0rem;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+
+  ${mediaQuery.sm} {
+    padding: 0 0.5rem;
+  }
 `;
 
 const BottomBar: React.FC<BottomBarProps> = ({
@@ -62,6 +61,9 @@ const BottomBar: React.FC<BottomBarProps> = ({
   setShadowMarkers,
   mapType,
   setMapType,
+  center,
+  timezone,
+  setCenter,
 }) => {
   return (
     <Bar>
@@ -72,9 +74,9 @@ const BottomBar: React.FC<BottomBarProps> = ({
             setShadowMarkers={setShadowMarkers}
             mapType={mapType}
           />
-          <MapFunctions map={map} mapType={mapType} setMapType={setMapType} />
+          <MapFunctions map={map} mapType={mapType} setMapType={setMapType} setCenter={setCenter} />
         </FunctionsWrapper>
-        <TimePicker date={date} setDate={setDate} />
+        <TimePicker timezone={timezone} date={date} setDate={setDate} center={center} />
       </StyledGrid>
     </Bar>
   );
