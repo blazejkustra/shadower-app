@@ -26,10 +26,8 @@ const Layout = styled.div`
 `;
 // TODO:
 // blad z markerem w tym samym miejscu
-// blad z czasem
-// blad ze zmiana strefy czasowej
 // poszukac wiecej bledow, zwalidowac dlugosc cieni
-// zmienic style poligonow z zaleznosci od typu mapy (satelita/normalna)
+// dokladnosc stawiania markerow, zmienic number na long number
 
 const MainLayout: React.FC = () => {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
@@ -74,6 +72,7 @@ const MainLayout: React.FC = () => {
         setMap={setMap}
         map={map}
         date={date}
+        timezone={timezone}
         height={height}
         debouncedCenter={center}
         setDebouncedCenter={setCenter}
@@ -82,6 +81,7 @@ const MainLayout: React.FC = () => {
         setMarkers={setMarkers}
         shadowMarkers={shadowMarkers}
         setShadowMarkers={setShadowMarkers}
+        mapType={mapType}
       />
     </Layout>
   );

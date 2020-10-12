@@ -6,13 +6,15 @@ import MapContent from "./MapContent";
 import { Coord, getShadowCoord } from "../utils/sun";
 import { Height } from "./MainLayout";
 import { useDebounce } from "react-use";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import styled from "styled-components";
+import { MapType } from "./MapFunctions";
 
 interface MapProps {
   map: google.maps.Map | null;
   setMap: (map: google.maps.Map | null) => void;
   date: DateTime;
+  timezone: string;
   height: Height;
   debouncedCenter: google.maps.LatLng;
   setDebouncedCenter: (center: google.maps.LatLng) => void;
@@ -21,6 +23,7 @@ interface MapProps {
   setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
   shadowMarkers: Array<Array<Coord>>;
   setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  mapType: MapType;
 }
 
 const MapContainer = styled.div`
@@ -46,6 +49,7 @@ const Map: React.FC<MapProps> = ({
   map,
   setMap,
   date,
+  timezone,
   height,
   debouncedCenter,
   setDebouncedCenter,
@@ -54,6 +58,7 @@ const Map: React.FC<MapProps> = ({
   setMarkers,
   shadowMarkers,
   setShadowMarkers,
+  mapType,
 }) => {
   const [center, setCenter] = useState<google.maps.LatLng>(debouncedCenter);
 
@@ -67,11 +72,17 @@ const Map: React.FC<MapProps> = ({
   const onMapClick = React.useCallback(
     (e: google.maps.MouseEvent) => {
       const objectCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+
+      const dateWithTimezone = DateTime.fromISO(date.toISO(), { zone: timezone });
+      const dateAtCenter = date.plus(
+        Duration.fromObject({ hours: date.hour - dateWithTimezone.hour }),
+      );
+
       const shadowCoord = getShadowCoord(
-        date.toJSDate(),
+        dateAtCenter,
         objectCoord.lat,
         objectCoord.lng,
-        parseInt(height.height, 10) * height.type, // floors to meters conversion
+        parseInt(height.height, 10) * height.type,
       );
 
       setShadowMarkers(current => {
@@ -86,7 +97,7 @@ const Map: React.FC<MapProps> = ({
         );
       });
     },
-    [date, height, setMarkers, setShadowMarkers, activeIndex],
+    [date, height, setMarkers, setShadowMarkers, activeIndex, timezone],
   );
 
   useEffect(() => {
@@ -94,14 +105,18 @@ const Map: React.FC<MapProps> = ({
 
     markers.forEach((markersGroup, groupIndex) => {
       markersGroup.forEach(({ lat, lng }) => {
+        const dateWithTimezone = DateTime.fromISO(date.toISO(), { zone: timezone });
+        const dateAtCenter = date.plus(
+          Duration.fromObject({ hours: date.hour - dateWithTimezone.hour }),
+        );
         newShadowMarkers[groupIndex].push(
-          getShadowCoord(date.toJSDate(), lat, lng, parseInt(height.height, 10) * height.type),
-        ); // floors to meters conversion
+          getShadowCoord(dateAtCenter, lat, lng, parseInt(height.height, 10) * height.type),
+        );
       });
     });
 
     setShadowMarkers(newShadowMarkers);
-  }, [date, markers, setShadowMarkers, height]);
+  }, [date, markers, setShadowMarkers, height, timezone]);
 
   const onCenterChanged = React.useCallback(() => {
     const lat = map?.getCenter().lat();
@@ -136,8 +151,10 @@ const Map: React.FC<MapProps> = ({
           setMarkers={setMarkers}
           shadowMarkers={shadowMarkers}
           date={date}
+          timezone={timezone}
           center={debouncedCenter}
           activeIndex={activeIndex}
+          mapType={mapType}
         />
       </GoogleMap>
     </MapContainer>

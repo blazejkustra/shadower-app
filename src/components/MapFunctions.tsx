@@ -75,7 +75,7 @@ const MapFunctions: React.FC<MapFunctionsProps> = ({ map, mapType, setMapType, s
           <SmallButton white onClick={() => setMapType(MapType.Map)}>
             Map View
           </SmallButton>
-          <LastButton white>
+          <LastButton white onClick={() => getLocation()}>
             {isLocationLoading ? (
               <Icon src="icons/loading.svg" />
             ) : (

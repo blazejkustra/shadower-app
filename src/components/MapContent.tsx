@@ -2,15 +2,17 @@ import React, { useCallback, useState } from "react";
 import { Coord, isDay } from "../utils/sun";
 import { getShadowPolygons } from "../utils/polygons";
 import { Circle, Polygon } from "@react-google-maps/api";
-import { DateTime } from "luxon";
-
+import { DateTime, Duration } from "luxon";
+import { MapType } from "./MapFunctions";
 interface MapContentProps {
   markers: Array<Array<Coord>>;
   setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
   shadowMarkers: Array<Array<Coord>>;
   date: DateTime;
+  timezone: string;
   center: google.maps.LatLng | null;
   activeIndex: number;
+  mapType: MapType;
 }
 
 const circleOptions = {
@@ -55,6 +57,48 @@ const ShadowPolygonOptions = {
   zIndex: 1,
 };
 
+const circleSatelliteOptions = {
+  fillColor: "#ffffff",
+  fillOpacity: 1,
+  strokeWeight: 0,
+  clickable: true,
+  draggable: true,
+  zIndex: 3,
+};
+
+const circleHoverSatelliteOptions = {
+  fillColor: "#E6E7E9",
+  fillOpacity: 1,
+  strokeWeight: 0,
+  clickable: true,
+  draggable: true,
+  zIndex: 3,
+};
+
+const transparentSatellitePolygonOptions = {
+  fillColor: "#ffffff",
+  fillOpacity: 0.6,
+  strokeColor: "#ffffff",
+  strokeOpacity: 1,
+  strokeWeight: 3,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  geodesic: false,
+  zIndex: 2,
+};
+
+const ShadowPolygonSatelliteOptions = {
+  fillColor: "#090E25",
+  fillOpacity: 0.5,
+  strokeWeight: 0,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  geodesic: false,
+  zIndex: 1,
+};
+
 const MapContent: React.FC<MapContentProps> = ({
   markers,
   setMarkers,
@@ -62,6 +106,8 @@ const MapContent: React.FC<MapContentProps> = ({
   date,
   center,
   activeIndex,
+  mapType,
+  timezone,
 }) => {
   const [markerHovered, setHover] = useState<Coord | null>(null);
 
@@ -101,35 +147,52 @@ const MapContent: React.FC<MapContentProps> = ({
     [setMarkers, activeIndex],
   );
 
-  const showShadow = isDay(date.toJSDate(), center?.lat(), center?.lng());
+  const dateWithTimezone = DateTime.fromISO(date.toISO(), { zone: timezone });
+  const dateAtCenter = date.plus(Duration.fromObject({ hours: date.hour - dateWithTimezone.hour }));
+  const showShadow = isDay(dateAtCenter.toJSDate(), center?.lat(), center?.lng());
+
   const shadowPolygons = showShadow
     ? markers.map((markerGroup, index) => getShadowPolygons(markerGroup, shadowMarkers[index]))
     : [markers];
 
   return (
     <>
-      {markers.map((markerGroup, groupIndex) => {
-        return markerGroup.map((marker, index) => {
-          if (groupIndex === activeIndex) {
-            return (
-              <Circle
-                key={`${marker.lat}-${marker.lng}-${index}-${groupIndex}`}
-                center={marker}
-                radius={1}
-                options={marker === markerHovered ? circleHoverOptions : circleOptions}
-                onDragStart={() => setHover(null)}
-                onDragEnd={e => onCircleDrag(e, index)}
-                onMouseOver={() => setHover(marker)}
-                onMouseOut={() => setHover(null)}
-                onClick={() => deleteMarker(marker, index)}
-              />
-            );
-          }
-        });
+      {markers[activeIndex].map((marker, index) => {
+        const options =
+          marker === markerHovered
+            ? mapType === MapType.Map
+              ? circleHoverOptions
+              : circleHoverSatelliteOptions
+            : mapType === MapType.Map
+            ? circleOptions
+            : circleSatelliteOptions;
+
+        return (
+          <Circle
+            key={`${marker.lat}-${marker.lng}-${index}-${activeIndex}`}
+            center={marker}
+            radius={1}
+            options={options}
+            onDragStart={() => setHover(null)}
+            onDragEnd={e => onCircleDrag(e, index)}
+            onMouseOver={() => setHover(marker)}
+            onMouseOut={() => setHover(null)}
+            onClick={() => deleteMarker(marker, index)}
+          />
+        );
       })}
-      <Polygon paths={markers} options={transparentPolygonOptions} />
+      <Polygon
+        paths={markers}
+        options={
+          mapType === MapType.Map ? transparentPolygonOptions : transparentSatellitePolygonOptions
+        }
+      />
       {shadowPolygons.map((shadowPolygon, index: number) => (
-        <Polygon paths={shadowPolygon} options={ShadowPolygonOptions} key={index} />
+        <Polygon
+          paths={shadowPolygon}
+          options={mapType === MapType.Map ? ShadowPolygonOptions : ShadowPolygonSatelliteOptions}
+          key={index}
+        />
       ))}
     </>
   );

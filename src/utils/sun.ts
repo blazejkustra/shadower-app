@@ -16,12 +16,12 @@ export const getSunPosition = (date: Date, lat: number, lng: number): SunPositio
   return { altitude, azimuth: azimuth };
 };
 
-export const getShadowCoord = (date: Date, lat: number, lng: number, height: number): Coord => {
+export const getShadowCoord = (date: DateTime, lat: number, lng: number, height: number): Coord => {
   if (!height) {
     return { lat, lng };
   }
 
-  const { altitude, azimuth } = getSunPosition(date, lat, lng);
+  const { altitude, azimuth } = getSunPosition(date.toJSDate(), lat, lng);
   const length = height / Math.tan(altitude) / 111111;
   const horizontal = length * Math.cos(azimuth);
   const vertical = length * Math.sin(azimuth);
@@ -58,12 +58,12 @@ export const getSunriseSunsetMinuteValues = (
   const { sunrise, sunset } = SunCalc.getTimes(date.toJSDate(), lat, lng);
 
   if (isNaN(sunrise.getTime()) || isNaN(sunset.getTime())) {
-    return { error: "NO_NIGHT" };
+    return { error: "POLAR_NIGHT_DAY" };
   }
+
   const sunriseEnd = DateTime.fromISO(sunrise.toISOString(), {
     zone,
   });
-
   const sunsetStart = DateTime.fromISO(sunset.toISOString(), {
     zone,
   });

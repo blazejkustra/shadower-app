@@ -75,7 +75,7 @@ const dotStyle: CSS.Properties = {
   display: "none",
 };
 
-const StyledSliderIcon = styled.img<{ position: number; edge?: boolean }>`
+const StyledIcon = styled.img<{ position: number; edge?: boolean }>`
   position: absolute;
   z-index: 10;
   pointer-events: none;
@@ -98,6 +98,7 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
   const [value, setValue] = useState(Math.round((date.hour * 60 + date.minute) / 5) * 5);
   const [sunriseValue, setSunriseValue] = useState(360);
   const [sunsetValue, setSunsetValue] = useState(1080);
+  const [iconsVisible, setIconsVisible] = useState(true);
 
   const onChange = (value: number) => {
     setValue(value);
@@ -128,17 +129,19 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
     );
 
     if (error) {
+      setIconsVisible(false);
     }
 
     if (sunriseMinutes && sunsetMinutes) {
       setSunriseValue(sunriseMinutes);
       setSunsetValue(sunsetMinutes);
+      setIconsVisible(true);
     }
   }, [center, date, timezone]);
 
   const middayValue = Math.round((sunriseValue + sunsetValue) / 10) * 5;
 
-  const marks = {
+  let marks = {
     0: "12 AM",
     [sunriseValue]: "SUNRISE",
     [middayValue]: "MIDDAY",
@@ -156,20 +159,26 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
     <SliderWrapper>
       <SliderContainer>
         <CurrentTime style={{ marginLeft: `calc(${value / 14.35}% - 2rem)` }}>{time}</CurrentTime>
-        <StyledSliderIcon src="/icons/slider-12am.svg" alt="Moon" position={0} edge />
-        <StyledSliderIcon src="/icons/slider-6am.svg" alt="Sunrise" position={sunrisePosition} />
-        <StyledSliderIcon src="/icons/slider-12pm.svg" alt="Sun" position={middayPosition} />
-        <StyledSliderIcon src="/icons/slider-6pm.svg" alt="Sunset" position={sunsetPosition} />
-        <StyledSliderIcon src="/icons/slider-12am.svg" alt="Moon" position={100} edge />
-        {Object.entries(marks).map(([position, value], index) => (
-          <Label
-            key={`${position}${value}`}
-            position={(parseFloat(position) / 1435) * 100}
-            edge={index === 0 || index === 4}
-            onClick={() => setValue(parseInt(position))}>
-            {value}
-          </Label>
-        ))}
+        <StyledIcon src="/icons/slider-12am.svg" alt="Moon" position={0} edge />
+        {iconsVisible && (
+          <>
+            <StyledIcon src="/icons/slider-6am.svg" alt="Sunrise" position={sunrisePosition} />
+            <StyledIcon src="/icons/slider-12pm.svg" alt="Sun" position={middayPosition} />
+            <StyledIcon src="/icons/slider-6pm.svg" alt="Sunset" position={sunsetPosition} />
+          </>
+        )}
+        <StyledIcon src="/icons/slider-12am.svg" alt="Moon" position={100} edge />
+        {Object.entries(marks).map(([position, value], index) =>
+          iconsVisible || index === 0 || index === 4 ? (
+            <Label
+              key={`${position}${value}`}
+              position={(parseFloat(position) / 1435) * 100}
+              edge={index === 0 || index === 4}
+              onClick={() => setValue(parseInt(position))}>
+              {value}
+            </Label>
+          ) : null,
+        )}
         <Slider
           max={1435}
           step={5}
