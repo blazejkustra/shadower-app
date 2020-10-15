@@ -3,12 +3,10 @@ import React from "react";
 import styled from "styled-components";
 
 import "rc-slider/assets/index.css";
-import { Grid } from "react-styled-flexboxgrid";
+import { Grid, Row, Col } from "react-styled-flexboxgrid";
 import { mediaQuery } from "./theme";
 import TimePicker from "./TimePicker";
 import MapFunctions from "./MapFunctions";
-import MarkerFunctions from "./MarkerFunctions";
-import { Coord } from "../utils/sun";
 import { MapType } from "./MapFunctions";
 import { DateTime } from "luxon";
 
@@ -17,14 +15,10 @@ interface BottomBarProps {
   date: DateTime;
   setDate: (value: DateTime) => void;
   map: google.maps.Map | null;
-  setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
-  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
   mapType: MapType;
   setMapType: React.Dispatch<React.SetStateAction<MapType>>;
   center: google.maps.LatLng;
   setCenter: (center: google.maps.LatLng) => void;
-  activeIndex: number;
-  setActiveIndex: (index: number) => void;
 }
 
 const Bar = styled.div`
@@ -59,29 +53,16 @@ const BottomBar: React.FC<BottomBarProps> = ({
   date,
   setDate,
   map,
-  setMarkers,
-  setShadowMarkers,
   mapType,
   setMapType,
   center,
   timezone,
   setCenter,
-  activeIndex,
-  setActiveIndex,
 }) => {
   return (
     <Bar>
       <StyledGrid>
-        <FunctionsWrapper>
-          <MarkerFunctions
-            setMarkers={setMarkers}
-            setShadowMarkers={setShadowMarkers}
-            mapType={mapType}
-            activeIndex={activeIndex}
-            setActiveIndex={setActiveIndex}
-          />
-          <MapFunctions map={map} mapType={mapType} setMapType={setMapType} setCenter={setCenter} />
-        </FunctionsWrapper>
+        <MapFunctions map={map} mapType={mapType} setMapType={setMapType} setCenter={setCenter} />
         <TimePicker timezone={timezone} date={date} setDate={setDate} center={center} />
       </StyledGrid>
     </Bar>

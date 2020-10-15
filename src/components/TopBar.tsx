@@ -3,10 +3,12 @@ import styled from "styled-components";
 
 import Search from "./Search";
 import DatePicker from "./DatePicker";
+import MarkerFunctions from "./MarkerFunctions";
 import HeightPicker from "./HeightPicker";
 import { Height } from "./MainLayout";
 import { mediaQuery } from "./theme";
 import { DateTime } from "luxon";
+import { Coord } from "../utils/sun";
 
 import { Grid, Col, Row } from "react-styled-flexboxgrid";
 
@@ -17,6 +19,10 @@ interface TopBarProps {
   height: Height;
   setHeight: (value: Height) => void;
   center: google.maps.LatLng;
+  setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
 }
 
 const Bar = styled.div`
@@ -36,9 +42,10 @@ const StyledGrid = styled(Grid)`
   box-shadow: 0px 24px 24px 0px rgb(9, 14, 37, 0.1);
   border-radius: 1rem;
   padding: 1rem;
+  margin-bottom: 1rem;
 
   ${mediaQuery.sm} {
-    border-radius: 0rem;
+    border-radius: 0;
   }
 `;
 
@@ -52,7 +59,18 @@ const SearchCol = styled(Col)`
   }
 `;
 
-const TopBar: React.FC<TopBarProps> = ({ map, date, setDate, height, setHeight, center }) => {
+const TopBar: React.FC<TopBarProps> = ({
+  map,
+  date,
+  setDate,
+  height,
+  setHeight,
+  center,
+  setMarkers,
+  setShadowMarkers,
+  activeIndex,
+  setActiveIndex,
+}) => {
   return (
     <Bar>
       <StyledGrid>
@@ -68,6 +86,14 @@ const TopBar: React.FC<TopBarProps> = ({ map, date, setDate, height, setHeight, 
           </Col>
         </Row>
       </StyledGrid>
+      <Grid>
+        <MarkerFunctions
+          setMarkers={setMarkers}
+          setShadowMarkers={setShadowMarkers}
+          activeIndex={activeIndex}
+          setActiveIndex={setActiveIndex}
+        />
+      </Grid>
     </Bar>
   );
 };

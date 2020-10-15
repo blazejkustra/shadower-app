@@ -50,6 +50,10 @@ const MainLayout: React.FC = () => {
         map={map}
         date={date}
         setDate={setDate}
+        setMarkers={setMarkers}
+        setShadowMarkers={setShadowMarkers}
+        activeIndex={activeIndex}
+        setActiveIndex={setActiveIndex}
         height={height}
         setHeight={setHeight}
         center={center}
@@ -59,14 +63,10 @@ const MainLayout: React.FC = () => {
         timezone={timezone}
         date={date}
         setDate={setDate}
-        setMarkers={setMarkers}
-        setShadowMarkers={setShadowMarkers}
         mapType={mapType}
         setMapType={setMapType}
         center={center}
         setCenter={setCenter}
-        activeIndex={activeIndex}
-        setActiveIndex={setActiveIndex}
       />
       <Map
         setMap={setMap}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { SmallButton } from "./atoms/Buttons";
+import { mediaQuery } from "./theme";
 
 export enum MapType {
   Satellite = "satellite",
@@ -17,10 +18,14 @@ interface MapFunctionsProps {
 
 const ButtonWrapper = styled.div`
   display: flex;
+  justify-content: flex-end;
   margin-bottom: 0.5rem;
+  ${mediaQuery} {
+    padding-right: 0.5rem;
+  }
 `;
 
-const LastButton = styled(SmallButton)`
+const LocationButton = styled(SmallButton)`
   width: 2.125rem;
   height: 2.125rem;
 
@@ -62,26 +67,26 @@ const MapFunctions: React.FC<MapFunctionsProps> = ({ map, mapType, setMapType, s
       {mapType === MapType.Map ? (
         <>
           <SmallButton onClick={() => setMapType(MapType.Satellite)}>Satellite View</SmallButton>
-          <LastButton onClick={() => getLocation()}>
+          <LocationButton onClick={() => getLocation()}>
             {isLocationLoading ? (
               <Icon src="icons/loading.svg" />
             ) : (
               <Icon src="icons/compass.svg" />
             )}
-          </LastButton>
+          </LocationButton>
         </>
       ) : (
         <>
           <SmallButton white onClick={() => setMapType(MapType.Map)}>
             Map View
           </SmallButton>
-          <LastButton white onClick={() => getLocation()}>
+          <LocationButton white onClick={() => getLocation()}>
             {isLocationLoading ? (
               <Icon src="icons/loading.svg" />
             ) : (
               <Icon src="icons/compass-black.svg" />
             )}
-          </LastButton>
+          </LocationButton>
         </>
       )}
     </ButtonWrapper>

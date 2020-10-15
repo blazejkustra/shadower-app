@@ -126,7 +126,7 @@ const Search: React.FC<SearchProps> = ({ map, center }) => {
   return (
     <InputWrapper onSelect={handleSubmit}>
       <InputInfo>
-        Location{" "}
+        Location
         <ErrorText>
           {error === "ZERO_RESULTS" ? "(No address matched your search)" : null}
         </ErrorText>
