@@ -12,7 +12,7 @@ Designed by <a href="https://dribbble.com/wodziczka">Daniel Wodziczka</a>
 
 ## Preview
 
-<img src="public/preview.gif" width="100%" height="100%" />
+<img src="public/preview.gif" />
 
 ## How to use
 
