@@ -68,9 +68,8 @@ export const getSunriseSunsetMinuteValues = (
     zone,
   });
 
-  // console.log(sunriseEnd.toString(), sunsetStart.toString());
-  const sunriseMinutes = sunriseEnd.hour * 60 + ((Math.round(sunriseEnd.minute / 5) * 5) % 60);
-  const sunsetMinutes = sunsetStart.hour * 60 + ((Math.round(sunsetStart.minute / 5) * 5) % 60);
+  const sunriseMinutes = sunriseEnd.hour * 60 + Math.round(sunriseEnd.minute / 5) * 5;
+  const sunsetMinutes = sunsetStart.hour * 60 + Math.round(sunsetStart.minute / 5) * 5;
 
   return { sunriseMinutes, sunsetMinutes };
 };

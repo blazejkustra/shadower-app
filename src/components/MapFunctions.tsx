@@ -19,10 +19,16 @@ interface MapFunctionsProps {
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+  align-items: flex-end;
   margin-bottom: 0.5rem;
-  ${mediaQuery} {
+
+  ${mediaQuery.sm} {
     padding-right: 0.5rem;
   }
+`;
+
+const MapTypeButton = styled(SmallButton)`
+  height: 2.125rem;
 `;
 
 const LocationButton = styled(SmallButton)`
@@ -66,7 +72,9 @@ const MapFunctions: React.FC<MapFunctionsProps> = ({ map, mapType, setMapType, s
     <ButtonWrapper>
       {mapType === MapType.Map ? (
         <>
-          <SmallButton onClick={() => setMapType(MapType.Satellite)}>Satellite View</SmallButton>
+          <MapTypeButton onClick={() => setMapType(MapType.Satellite)}>
+            Satellite View
+          </MapTypeButton>
           <LocationButton onClick={() => getLocation()}>
             {isLocationLoading ? (
               <Icon src="icons/loading.svg" />
@@ -77,9 +85,9 @@ const MapFunctions: React.FC<MapFunctionsProps> = ({ map, mapType, setMapType, s
         </>
       ) : (
         <>
-          <SmallButton white onClick={() => setMapType(MapType.Map)}>
+          <MapTypeButton white onClick={() => setMapType(MapType.Map)}>
             Map View
-          </SmallButton>
+          </MapTypeButton>
           <LocationButton white onClick={() => getLocation()}>
             {isLocationLoading ? (
               <Icon src="icons/loading.svg" />

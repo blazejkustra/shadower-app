@@ -39,30 +39,47 @@ const ChevronImage = styled.img`
 `;
 
 interface SearchProps {
-  height: Height;
-  setHeight: React.Dispatch<Height>;
+  heights: Array<Height>;
+  setHeight: React.Dispatch<React.SetStateAction<Array<Height>>>;
+  activeIndex: number;
 }
 
-const HeightPicker: React.FC<SearchProps> = ({ height, setHeight }) => {
+const HeightPicker: React.FC<SearchProps> = ({ heights, setHeight, activeIndex }) => {
   const [inputFocused, setFocus] = useState(false);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
-      setHeight({ ...height, height: "0" });
+      setHeight(current =>
+        current.map((heightGroup, groupIndex) =>
+          activeIndex === groupIndex ? { ...heightGroup, height: "0" } : heightGroup,
+        ),
+      );
       return;
     }
 
     const value = parseInt(e.target.value, 10).toString();
     if (value.match(/^[1-9][0-9]*$|^0$/)) {
-      setHeight({ ...height, height: value });
+      setHeight(current =>
+        current.map((heightGroup, groupIndex) =>
+          activeIndex === groupIndex ? { ...heightGroup, height: value } : heightGroup,
+        ),
+      );
     }
   };
 
   const handleSelect = (type: string) => {
     if (type === "Floors") {
-      setHeight({ ...height, type: HeightType.Floors });
+      setHeight(current =>
+        current.map((heightGroup, groupIndex) =>
+          activeIndex === groupIndex ? { ...heightGroup, type: HeightType.Floors } : heightGroup,
+        ),
+      );
     } else {
-      setHeight({ ...height, type: HeightType.Meters });
+      setHeight(current =>
+        current.map((heightGroup, groupIndex) =>
+          activeIndex === groupIndex ? { ...heightGroup, type: HeightType.Meters } : heightGroup,
+        ),
+      );
     }
   };
 
@@ -71,7 +88,11 @@ const HeightPicker: React.FC<SearchProps> = ({ height, setHeight }) => {
       <InputInfo>Height</InputInfo>
       <InputContainer>
         <HeightWrapper>
-          <Input value={height.height} onChange={handleInput} placeholder="Object height" />
+          <Input
+            value={heights[activeIndex].height}
+            onChange={handleInput}
+            placeholder="Object height"
+          />
         </HeightWrapper>
 
         <TypeWrapper
@@ -79,11 +100,13 @@ const HeightPicker: React.FC<SearchProps> = ({ height, setHeight }) => {
           onSelect={handleSelect}
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}>
-          <Input value={height.type === HeightType.Floors ? "Floors" : "Meters"} />
+          <Input value={heights[activeIndex].type === HeightType.Floors ? "Floors" : "Meters"} />
           <DropdownStyle portal={false} />
           <Dropdown>
             <DropdownList persistSelection>
-              <DropdownOption value={height.type === HeightType.Meters ? "Floors" : "Meters"} />
+              <DropdownOption
+                value={heights[activeIndex].type === HeightType.Meters ? "Floors" : "Meters"}
+              />
             </DropdownList>
           </Dropdown>
         </TypeWrapper>

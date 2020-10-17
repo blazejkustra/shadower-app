@@ -9,6 +9,7 @@ import "rc-slider/assets/index.css";
 import Slider from "rc-slider";
 import { mediaQuery } from "./theme";
 import { getSunriseSunsetMinuteValues } from "../utils/sun";
+import { useMobile } from "../styles/styles";
 
 interface PickerProps {
   timezone: string;
@@ -17,11 +18,11 @@ interface PickerProps {
   center: google.maps.LatLng;
 }
 
-const SliderWrapper = styled.div`
+const SliderWrapper = styled.div<{ isMobile: boolean }>`
   background-color: ${props => props.theme.colors.white};
   border-radius: 1rem;
   width: 100%;
-  height: 6.875rem;
+  height: ${props => (props.isMobile ? "5.5rem" : "6.875rem")};
 
   padding: 1rem 3rem;
   box-shadow: 0px 24px 24px 0px rgb(9, 14, 37, 0.1);
@@ -99,6 +100,7 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
   const [sunriseValue, setSunriseValue] = useState(360);
   const [sunsetValue, setSunsetValue] = useState(1080);
   const [iconsVisible, setIconsVisible] = useState(true);
+  const isMobile = useMobile();
 
   const onChange = (value: number) => {
     setValue(value);
@@ -118,9 +120,10 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
   );
 
   useEffect(() => {
-    const dateAtCenter = DateTime.fromISO(DateTime.local().set({ hour: 12, minute: 0 }).toISO(), {
+    const dateAtCenter = DateTime.fromISO(date.set({ hour: 12, minute: 0 }).toISO(), {
       zone: timezone,
     });
+
     const { sunriseMinutes, sunsetMinutes, error } = getSunriseSunsetMinuteValues(
       dateAtCenter,
       timezone,
@@ -156,7 +159,7 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
   const middayPosition = (sunrisePosition + sunsetPosition) / 2;
 
   return (
-    <SliderWrapper>
+    <SliderWrapper isMobile={isMobile}>
       <SliderContainer>
         <CurrentTime style={{ marginLeft: `calc(${value / 14.35}% - 2rem)` }}>{time}</CurrentTime>
         <StyledIcon src="/icons/slider-12am.svg" alt="Moon" position={0} edge />
@@ -168,17 +171,18 @@ const TimePicker: React.FC<PickerProps> = ({ date, setDate, center, timezone }) 
           </>
         )}
         <StyledIcon src="/icons/slider-12am.svg" alt="Moon" position={100} edge />
-        {Object.entries(marks).map(([position, value], index) =>
-          iconsVisible || index === 0 || index === 4 ? (
-            <Label
-              key={`${position}${value}`}
-              position={(parseFloat(position) / 1435) * 100}
-              edge={index === 0 || index === 4}
-              onClick={() => setValue(parseInt(position))}>
-              {value}
-            </Label>
-          ) : null,
-        )}
+        {!isMobile &&
+          Object.entries(marks).map(([position, value], index) =>
+            iconsVisible || index === 0 || index === 4 ? (
+              <Label
+                key={`${position}${value}`}
+                position={(parseFloat(position) / 1435) * 100}
+                edge={index === 0 || index === 4}
+                onClick={() => setValue(parseInt(position))}>
+                {value}
+              </Label>
+            ) : null,
+          )}
         <Slider
           max={1435}
           step={5}

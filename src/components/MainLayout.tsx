@@ -24,16 +24,17 @@ const Layout = styled.div`
   width: 100vw;
   height: 100vh;
 `;
-// TODO:
-// blad z markerem w tym samym miejscu
-// poszukac wiecej bledow, zwalidowac dlugosc cieni
-// dokladnosc stawiania markerow, zmienic number na long number
 
 const MainLayout: React.FC = () => {
   const [map, setMap] = React.useState<google.maps.Map | null>(null);
   const [date, setDate] = useState<DateTime>(DateTime.local());
   const [timezone, setTimezone] = useState<string>("");
-  const [height, setHeight] = useState<Height>({ type: HeightType.Floors, height: "1" });
+  const [height, setHeight] = useState<Height[]>([
+    { type: HeightType.Floors, height: "1" },
+    { type: HeightType.Floors, height: "1" },
+    { type: HeightType.Floors, height: "1" },
+    { type: HeightType.Floors, height: "1" },
+  ]);
   const [markers, setMarkers] = useState<Array<Array<Coord>>>([[], [], [], []]);
   const [shadowMarkers, setShadowMarkers] = useState<Array<Array<Coord>>>([[], [], [], []]);
   const [activeIndex, setActiveIndex] = useState<number>(0);

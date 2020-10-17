@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { SmallButton } from "./atoms/Buttons";
 import { Coord } from "../utils/sun";
 import { InputInfo } from "../styles/DropdownStyles";
+import { mediaQuery } from "./theme";
+import { useMobile } from "../styles/styles";
 
 interface MarkersFunctionsProps {
   setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
@@ -13,8 +15,17 @@ interface MarkersFunctionsProps {
 }
 
 const Wrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   justify-content: flex-start;
+
+  margin-top: 1rem;
+
+  ${mediaQuery.sm} {
+    margin: 1rem;
+  }
 `;
 
 const Container = styled.div`
@@ -26,6 +37,14 @@ const Container = styled.div`
 
 const ButtonWrapper = styled.div`
   display: flex;
+`;
+
+const ResetButton = styled(SmallButton)`
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  margin: 0.5rem;
 `;
 
 const ShapeButton = styled(SmallButton)<{ active: boolean }>`
@@ -44,6 +63,20 @@ const MarkersFunctions: React.FC<MarkersFunctionsProps> = ({
   activeIndex,
   setActiveIndex,
 }) => {
+  const isMobile = useMobile();
+
+  if (isMobile) {
+    return (
+      <ResetButton
+        onClick={() => {
+          setMarkers([[], [], [], []]);
+          setShadowMarkers([[], [], [], []]);
+        }}>
+        Reset all
+      </ResetButton>
+    );
+  }
+
   return (
     <Wrapper>
       <Container>

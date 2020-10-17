@@ -115,7 +115,7 @@ export const InputInfo = styled.p`
   ${mediaQuery.sm} {
     font-size: 0.75rem;
     line-height: 1rem;
-    padding-bottom: 0.25rem;
+    padding-bottom: 0.375rem;
   }
 `;
 

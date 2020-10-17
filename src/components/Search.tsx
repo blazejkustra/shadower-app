@@ -87,7 +87,7 @@ const Search: React.FC<SearchProps> = ({ map, center }) => {
   } = usePlacesAutocomplete({
     requestOptions: {
       location: center,
-      radius: 500 * 1000,
+      radius: 1000,
     },
     debounce: 300,
   });

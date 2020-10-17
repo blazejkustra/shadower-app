@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 
 import "rc-slider/assets/index.css";
-import { Grid, Row, Col } from "react-styled-flexboxgrid";
+import { Grid } from "react-styled-flexboxgrid";
 import { mediaQuery } from "./theme";
 import TimePicker from "./TimePicker";
 import MapFunctions from "./MapFunctions";
@@ -36,17 +36,6 @@ const Bar = styled.div`
 
 const StyledGrid = styled(Grid)`
   padding: 0;
-`;
-
-const FunctionsWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-
-  ${mediaQuery.sm} {
-    padding: 0 0.5rem;
-  }
 `;
 
 const BottomBar: React.FC<BottomBarProps> = ({

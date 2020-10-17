@@ -16,8 +16,8 @@ interface TopBarProps {
   map: google.maps.Map | null;
   date: DateTime;
   setDate: (value: DateTime) => void;
-  height: Height;
-  setHeight: (value: Height) => void;
+  height: Array<Height>;
+  setHeight: React.Dispatch<React.SetStateAction<Array<Height>>>;
   center: google.maps.LatLng;
   setMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
   setShadowMarkers: React.Dispatch<React.SetStateAction<Array<Array<Coord>>>>;
@@ -42,7 +42,6 @@ const StyledGrid = styled(Grid)`
   box-shadow: 0px 24px 24px 0px rgb(9, 14, 37, 0.1);
   border-radius: 1rem;
   padding: 1rem;
-  margin-bottom: 1rem;
 
   ${mediaQuery.sm} {
     border-radius: 0;
@@ -82,11 +81,11 @@ const TopBar: React.FC<TopBarProps> = ({
             <DatePicker date={date} setDate={setDate} />
           </Col>
           <Col xs={6} sm={6} md={4}>
-            <HeightPicker height={height} setHeight={setHeight} />
+            <HeightPicker heights={height} setHeight={setHeight} activeIndex={activeIndex} />
           </Col>
         </Row>
       </StyledGrid>
-      <Grid>
+      <Grid style={{ position: "relative" }}>
         <MarkerFunctions
           setMarkers={setMarkers}
           setShadowMarkers={setShadowMarkers}

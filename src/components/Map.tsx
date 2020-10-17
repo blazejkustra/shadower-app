@@ -15,7 +15,7 @@ interface MapProps {
   setMap: (map: google.maps.Map | null) => void;
   date: DateTime;
   timezone: string;
-  height: Height;
+  height: Height[];
   debouncedCenter: google.maps.LatLng;
   setDebouncedCenter: (center: google.maps.LatLng) => void;
   activeIndex: number;
@@ -43,6 +43,7 @@ const options: google.maps.MapOptions = {
   disableDefaultUI: true,
   styles: mapStyles,
   tilt: 0,
+  gestureHandling: "greedy",
 };
 
 const Map: React.FC<MapProps> = ({
@@ -73,6 +74,13 @@ const Map: React.FC<MapProps> = ({
     (e: google.maps.MouseEvent) => {
       const objectCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
 
+      const coordAlreadyExist = markers[activeIndex].some(
+        marker => marker.lat === objectCoord.lat && marker.lng === objectCoord.lng,
+      );
+      if (coordAlreadyExist) {
+        return;
+      }
+
       const dateWithTimezone = DateTime.fromISO(date.toISO(), { zone: timezone });
       const dateAtCenter = date.plus(
         Duration.fromObject({ hours: date.hour - dateWithTimezone.hour }),
@@ -82,7 +90,7 @@ const Map: React.FC<MapProps> = ({
         dateAtCenter,
         objectCoord.lat,
         objectCoord.lng,
-        parseInt(height.height, 10) * height.type,
+        parseInt(height[activeIndex].height, 10) * height[activeIndex].type,
       );
 
       setShadowMarkers(current => {
@@ -97,7 +105,7 @@ const Map: React.FC<MapProps> = ({
         );
       });
     },
-    [date, height, setMarkers, setShadowMarkers, activeIndex, timezone],
+    [date, height, markers, setMarkers, setShadowMarkers, activeIndex, timezone],
   );
 
   useEffect(() => {
@@ -110,7 +118,12 @@ const Map: React.FC<MapProps> = ({
           Duration.fromObject({ hours: date.hour - dateWithTimezone.hour }),
         );
         newShadowMarkers[groupIndex].push(
-          getShadowCoord(dateAtCenter, lat, lng, parseInt(height.height, 10) * height.type),
+          getShadowCoord(
+            dateAtCenter,
+            lat,
+            lng,
+            parseInt(height[groupIndex].height, 10) * height[groupIndex].type,
+          ),
         );
       });
     });
