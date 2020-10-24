@@ -1,6 +1,6 @@
 # shadower-app
 
-Have you ever wondered where the shadow will be during the day? Whether it will cover your location at a specific time? Shadower is a tool that shows the shadow of an given object
+Have you ever wondered where the shadow will be during the day? Whether it will cover your location at a specific time? Shadower is a tool that shows the shadow of a given object at a given time.
 
 <img src="public/cover.png" width="100%" height="100%" />
 
