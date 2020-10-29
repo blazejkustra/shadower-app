@@ -4,7 +4,7 @@ Have you ever wondered where the shadow will be during the day? Whether it will 
 
 <img src="public/cover.png" width="100%" height="100%" />
 
-\*Or know where to find the sun 🌞
+### \*Or know where to find the sun 🌞
 
 ## Design
 
